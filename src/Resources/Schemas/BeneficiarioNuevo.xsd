@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	 xmlns="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/BeneficiarioNuevo.xsd"
+	 targetNamespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/BeneficiarioNuevo.xsd"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+	<xs:element name="INPUT">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="DATOS_AMBIENTE">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="APLICATIVO" type="xs:string" nillable="true"/>
+							<xs:element name="CANAL_LGC" type="xs:string" nillable="true"/>
+							<xs:element name="USUARIO_ALT" type="xs:string" nillable="true"/>
+							<xs:element name="IP_SERVIDOR" type="xs:string" nillable="true"/>
+							<xs:element name="COD_FUNCIONALIDAD" type="xs:string" nillable="true"/>
+							<xs:element name="TIPO_FUNCIONALIDAD" type="xs:string" nillable="true"/>
+							<xs:choice minOccurs="0">
+								<xs:element name="MODO_CONSULTA" type="xs:string"/>
+								<xs:element name="MODO_EVALUACION" type="xs:string"/>
+							</xs:choice>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="DATOS_TRANSACCION">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="DATA" type="xs:string" nillable="true"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OUTPUT">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="INFORMACION">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODIGO" type="xs:string" nillable="true"/>
+							<xs:element name="RESULTADO" type="xs:string" nillable="true"/>
+							<xs:element name="MENSAJE" type="xs:string" nillable="true"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="RECOMENDACION" type="xs:string"/>
+				<xs:element name="MECANISMO_SEGURIDAD" type="xs:string" minOccurs="0"/>
+				<xs:element name="POLITICAS" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODIGO" type="xs:string"/>
+							<xs:element name="VALOR" type="xs:string" minOccurs="0"/>
+							<xs:element name="DESCRIPCION" type="xs:string"/>
+							<xs:choice>
+								<xs:element name="VALOR" type="xs:string"/>
+								<xs:element name="VALOR_FORMATEADO" type="xs:string"/>
+							</xs:choice>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

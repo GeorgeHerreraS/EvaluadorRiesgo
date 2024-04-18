@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+	<xs:element name="DATA">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="RUT_CARGO" type="xs:string"/>
+				<xs:element name="CUENTA_CARGO" type="xs:string"/>
+				<xs:element name="RUT_ABONO" type="xs:string"/>
+				<xs:element name="CUENTA_ABONO" type="xs:string"/>
+				<xs:element name="MONTO_TEF" type="xs:string"/>
+				<xs:element name="FECHA_TEF" type="xs:string"/>
+				<xs:element name="CODIGO_PRODUCTO" type="xs:string"/>
+				<xs:element name="CODIGO_SUBPRODUCTO" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

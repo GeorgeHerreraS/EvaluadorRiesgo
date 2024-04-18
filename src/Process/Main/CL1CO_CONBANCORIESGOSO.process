@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/BancoRiesgoso.xsd" xmlns:pfx2="http://www.tibco.com/schemas/src/Resources/Schemas/Schema.xsd" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Resources/Schemas/CDATA_BeneficiarioNuevo.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns4="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/SumatoriaTef_BancoRiesgoso.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns3="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/IndicadorTef_BancoRiesgoso.xsd" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions">
+    <xsd:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/BancoRiesgoso.xsd" schemaLocation="/Resources/Schemas/BancoRiesgoso.xsd"/>
+    <xsd:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" schemaLocation="/Resources/Schemas/Informacion.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Resources/Schemas/CDATA_BeneficiarioNuevo.xsd" schemaLocation="/Resources/Schemas/CDATA_BeneficiarioNuevo.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/schemas/src/Resources/Schemas/Schema.xsd" schemaLocation="/Resources/Schemas/CL1CO_CONBANCORIESGOSO.xsd"/>
+    <pd:name>Process/Main/CL1CO_CONBANCORIESGOSO.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx2:inputSet"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>35</pd:startY>
+    <pd:returnBindings>
+        <pfx2:output>
+            <ns2:Informacion>
+                <ns2:Codigo>
+                    <xsl:value-of select="$ControlDeErroresCatch/ns2:Informacion/ns2:Codigo"/>
+                </ns2:Codigo>
+                <ns2:Resultado>
+                    <xsl:value-of select="$ControlDeErroresCatch/ns2:Informacion/ns2:Resultado"/>
+                </ns2:Resultado>
+                <ns2:Mensaje>
+                    <xsl:value-of select="$ControlDeErroresCatch/ns2:Informacion/ns2:Mensaje"/>
+                </ns2:Mensaje>
+            </ns2:Informacion>
+            <pfx2:OTP>
+                <xsl:value-of select="if($Regla1/root/OTP='SI' and $Monto/group/OTP='SI')&#xA;then ($Regla1/root/OTP)&#xA;else if($Regla2/root/OTP='SI' and $Monto/group/OTP='SI')&#xA;then ($Regla2/root/OTP)&#xA;else if($Regla3/root/OTP='NO' and $Monto/group/OTP='NO')&#xA;then ($Regla3/root/OTP)&#xA;else if($Regla3/root/OTP='SI' and $Monto/group/OTP='NO')&#xA;then ($Regla3_1/root/OTP)&#xA;else if($Monto/group/OTP='SI' )&#xA;then ($Monto/group/OTP)&#xA;else if($CDA/root/OTP='NO' )&#xA;then ($CDA/root/OTP)&#xA;else ($ControlDeErroresCatch/ns2:Informacion)"/>
+            </pfx2:OTP>
+            <pfx2:MENSAJE>
+                <xsl:value-of select="if($Regla1/root/OTP='SI' and $Monto/group/OTP='SI')&#xA;then ($Regla1/root/MENSAJE)&#xA;else if($Regla2/root/OTP='SI' and $Monto/group/OTP='SI')&#xA;then ($Regla2/root/MENSAJE)&#xA;else if($Regla3/root/OTP='SI' and $Monto/group/OTP='NO')&#xA;then ($Regla3_1/root/MENSAJE)&#xA;else if($Monto/group/OTP='SI' )&#xA;then ($Monto/group/MENSAJE)&#xA;else if($Monto/group/OTP='SI' and $Regla1/root/Cod_Pca=441)&#xA;then ($Monto/group/MENSAJE)&#xA;else if($Monto/group/OTP='SI' and $Regla1/root/Cod_Pca=442)&#xA;then ($Monto/group/MENSAJE)&#xA;else if($CDA/root/OTP='NO')&#xA;then ($CDA/root/MENSAJE)&#xA;else ($ControlDeErroresCatch/ns2:Informacion)"/>
+            </pfx2:MENSAJE>
+        </pfx2:output>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx2:output"/>
+    <pd:endX>649</pd:endX>
+    <pd:endY>35</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <CDA>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="OTP" type="xsd:string"/>
+                        <xsd:element name="MENSAJE" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </CDA>
+        <Regla2>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="OTP" type="xsd:string"/>
+                        <xsd:element name="Cod_Pca" type="xsd:int"/>
+                        <xsd:element name="Fch_Hra_Inz_Trn_T" type="xsd:dateTime" minOccurs="0"/>
+                        <xsd:element name="Mnt_Tef" type="xsd:int" minOccurs="0"/>
+                        <xsd:element name="FechaHoy" type="xsd:dateTime"/>
+                        <xsd:element name="MENSAJE" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Regla2>
+        <Regla1>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="Cod_Pca" type="xsd:int"/>
+                        <xsd:element name="Val_Pmt" type="xsd:string"/>
+                        <xsd:element name="OTP" type="xsd:string"/>
+                        <xsd:element name="MENSAJE" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Regla1>
+        <Monto>
+            <xsd:element name="group">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="OTP" type="xsd:string"/>
+                        <xsd:element name="MENSAJE" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Monto>
+        <Regla3>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="Mnt_Tef_Acm" type="xsd:int"/>
+                        <xsd:element name="OTP" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Regla3>
+        <Regla3_1>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="Mnt_Tef_Acm" type="xsd:int"/>
+                        <xsd:element name="OTP" type="xsd:string"/>
+                        <xsd:element name="MENSAJE" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Regla3_1>
+    </pd:processVariables>
+    <pd:targetNamespace>http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Process/Main/CL1CO_CONBancoRiesgoso</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>931</pd:x>
+        <pd:y>157</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="CL1SPORAC_CONPoliticasPersonasPRSNA">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:description>PKG_APS_AMTE.SP_APS_CRDND_PRSNA_PRSNA</pd:description>
+        <pd:x>140</pd:x>
+        <pd:y>36</pd:y>
+        <config>
+            <processName>/Process/SubProcess/CL1SPORAC_CONPoliticasPersonasPRSNA.process</processName>
+        </config>
+        <pd:inputBindings>
+            <pfx:inputSet>
+                <pfx:IN_COD_CNL_LGC>
+                    <xsl:value-of select="$Start/pfx2:inputSet/pfx2:IN_COD_CNL_LGC"/>
+                </pfx:IN_COD_CNL_LGC>
+                <pfx:IN_COD_FNC>
+                    <xsl:value-of select="$Start/pfx2:inputSet/pfx2:IN_COD_FNC"/>
+                </pfx:IN_COD_FNC>
+                <pfx:IN_COD_TPO_FNC>
+                    <xsl:value-of select="$Start/pfx2:inputSet/pfx2:IN_COD_TPO_FNC"/>
+                </pfx:IN_COD_TPO_FNC>
+                <pfx:IN_TPO_MND>
+                    <xsl:value-of select="$Start/pfx2:inputSet/pfx2:IN_TPO_MND"/>
+                </pfx:IN_TPO_MND>
+                <pfx:IN_COD_SGM>
+                    <xsl:value-of select="$Start/pfx2:inputSet/pfx2:IN_COD_SGM"/>
+                </pfx:IN_COD_SGM>
+                <pfx:COD_BCO_RSG>
+                    <xsl:value-of select="$Start/pfx2:inputSet/pfx2:COD_BCO_RSG"/>
+                </pfx:COD_BCO_RSG>
+            </pfx:inputSet>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="CL1SPSQL_CONFechaMontoUltimaTef">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:description>sp_hob_cnr_trf_bfc_nvo</pd:description>
+        <pd:x>98</pd:x>
+        <pd:y>138</pd:y>
+        <config>
+            <processName>/Process/SubProcess/CL1SPSQL_CONFechaMontoUltimaTef.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns3:inputSet>
+                <ns3:nro_doc_cgo>
+                    <xsl:value-of select="$Start/pfx2:inputSet/pfx2:nro_doc_cgo"/>
+                </ns3:nro_doc_cgo>
+                <ns3:nro_cta_cgo_usr_innet>
+                    <xsl:value-of select="$Start/pfx2:inputSet/pfx2:nro_cta_cgo_usr_innet"/>
+                </ns3:nro_cta_cgo_usr_innet>
+                <ns3:nro_doc_abn>
+                    <xsl:value-of select="$Start/pfx2:inputSet/pfx2:nro_doc_abn"/>
+                </ns3:nro_doc_abn>
+                <ns3:nro_cta_abn>
+                    <xsl:value-of select="$Start/pfx2:inputSet/pfx2:nro_cta_abn"/>
+                </ns3:nro_cta_abn>
+                <ns3:mnt_tef>
+                    <xsl:value-of select="$Start/pfx2:inputSet/pfx2:mnt_tef"/>
+                </ns3:mnt_tef>
+                <ns3:fch_hra_cgo>
+                    <xsl:value-of select="$Start/pfx2:inputSet/pfx2:fch_hra_cgo"/>
+                </ns3:fch_hra_cgo>
+            </ns3:inputSet>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="CL1SPSQL_CONMontoAcumuladoTef">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:description>sp_hob_cnr_trf_mnt_acm</pd:description>
+        <pd:x>262</pd:x>
+        <pd:y>230</pd:y>
+        <config>
+            <processName>/Process/SubProcess/CL1SPSQL_CONMontoAcumuladoTef.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns4:inputSet>
+                <ns4:nro_doc_cgo>
+                    <xsl:value-of select="$Start/pfx2:inputSet/pfx2:nro_doc_cgo"/>
+                </ns4:nro_doc_cgo>
+                <ns4:nro_doc_abn>
+                    <xsl:value-of select="$Start/pfx2:inputSet/pfx2:nro_doc_abn"/>
+                </ns4:nro_doc_abn>
+                <ns4:nro_cta_abn>
+                    <xsl:value-of select="$Start/pfx2:inputSet/pfx2:nro_cta_abn"/>
+                </ns4:nro_cta_abn>
+                <ns4:cod_bco_cca>
+                    <xsl:value-of select="$Start/pfx2:inputSet/pfx2:COD_BCO_RSG"/>
+                </ns4:cod_bco_cca>
+                <ns4:fch_hra_cgo>
+                    <xsl:value-of select="tib:add-to-dateTime($Start/pfx2:inputSet/pfx2:fch_hra_cgo, 0, 0, 0,-($CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1[pfx:COD_PCA=500]/pfx:VAL_PMT) , 0, 0)"/>
+                </ns4:fch_hra_cgo>
+            </ns4:inputSet>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ControlDeErroresCatch">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>926</pd:x>
+        <pd:y>38</pd:y>
+        <config>
+            <processName>/Process/SubProcess/ControlDeErrores.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <elemento>
+                    <xsl:value-of select="''"/>
+                </elemento>
+                <WARNING>
+                    <xsl:value-of select="$CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:WS_WARNING"/>
+                </WARNING>
+                <xsl:copy-of select="$_error/ns1:ErrorReport"/>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Regla1">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>245</pd:x>
+        <pd:y>121</pd:y>
+        <config>
+            <variableName>Regla1</variableName>
+        </config>
+        <pd:inputBindings>
+            <xsl:choose>
+                <xsl:when test="$CL1SPSQL_CONFechaMontoUltimaTef/ns3:outputset/ns3:Resultsets/ns3:ResultSet1/ns3:Record1/ns3:ind_tef=1 or $CL1SPSQL_CONFechaMontoUltimaTef/ns3:outputset/ns3:Resultsets/ns3:ResultSet1/ns3:Record1/ns3:ind_tef=3">
+                    <root>
+                        <Cod_Pca>
+                            <xsl:value-of select="441"/>
+                        </Cod_Pca>
+                        <Val_Pmt>
+                            <xsl:value-of select="round($CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1[pfx:COD_PCA=441]/pfx:VAL_PMT)"/>
+                        </Val_Pmt>
+                        <OTP>
+                            <xsl:value-of select="'SI'"/>
+                        </OTP>
+                        <MENSAJE>
+                            <xsl:value-of select="'Cumple Regla1, Menor a 72 hrs'"/>
+                        </MENSAJE>
+                    </root>
+                </xsl:when>
+                <xsl:when test="$CL1SPSQL_CONFechaMontoUltimaTef/ns3:outputset/ns3:Resultsets/ns3:ResultSet1/ns3:Record1/ns3:ind_tef=2 or $CL1SPSQL_CONFechaMontoUltimaTef/ns3:outputset/ns3:Resultsets/ns3:ResultSet1/ns3:Record1/ns3:ind_tef>3">
+                    <root>
+                        <Cod_Pca>
+                            <xsl:value-of select="442"/>
+                        </Cod_Pca>
+                        <Val_Pmt>
+                            <xsl:value-of select="round($CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1[pfx:COD_PCA=440]/pfx:VAL_PMT)"/>
+                        </Val_Pmt>
+                        <OTP>
+                            <xsl:value-of select="'NO'"/>
+                        </OTP>
+                        <MENSAJE>
+                            <xsl:value-of select="''"/>
+                        </MENSAJE>
+                    </root>
+                </xsl:when>
+                <xsl:otherwise>
+                    <root>
+                        <Cod_Pca>
+                            <xsl:value-of select="442"/>
+                        </Cod_Pca>
+                        <Val_Pmt>
+                            <xsl:value-of select="round($CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1[pfx:COD_PCA=440]/pfx:VAL_PMT)"/>
+                        </Val_Pmt>
+                        <OTP>
+                            <xsl:value-of select="'NO'"/>
+                        </OTP>
+                        <MENSAJE>
+                            <xsl:value-of select="''"/>
+                        </MENSAJE>
+                    </root>
+                </xsl:otherwise>
+            </xsl:choose>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Regla2">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>409</pd:x>
+        <pd:y>204</pd:y>
+        <config>
+            <variableName>Regla2</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:variable name="varFechaUltimaTef" select="tib:add-to-dateTime($CL1SPSQL_CONFechaMontoUltimaTef/ns3:outputset/ns3:Resultsets/ns3:ResultSet1/ns3:Record1/ns3:fch_hra_lnz_trn, 0, 0, 0, $Regla1/root/Val_Pmt, 0, 0)"/>
+                <xsl:variable name="varFechaHoyL" select="current-dateTime()"/>
+                <OTP>
+                    <xsl:value-of select="if(tib:compare-dateTime( $varFechaUltimaTef,$varFechaHoyL)=1) then ('SI')&#xA;else ('NO')"/>
+                </OTP>
+                <Cod_Pca>
+                    <xsl:value-of select="if(tib:compare-dateTime( $varFechaUltimaTef,$varFechaHoyL)=1)&#xA; then (441)&#xA; else (442)"/>
+                </Cod_Pca>
+                <Fch_Hra_Inz_Trn_T>
+                    <xsl:value-of select="$varFechaUltimaTef"/>
+                </Fch_Hra_Inz_Trn_T>
+                <Mnt_Tef>
+                    <xsl:value-of select="$CL1SPSQL_CONFechaMontoUltimaTef/ns3:outputset/ns3:Resultsets/ns3:ResultSet1/ns3:Record1/ns3:mnt_tef"/>
+                </Mnt_Tef>
+                <xsl:variable name="varFechaSTef" select="tib:add-to-dateTime($CL1SPSQL_CONFechaMontoUltimaTef/ns3:outputset/ns3:Resultsets/ns3:ResultSet1/ns3:Record1/ns3:fch_hra_lnz_trn, 0, 0, 0, $Regla1/root/Val_Pmt, 0, 0)"/>
+                <FechaHoy>
+                    <xsl:value-of select="$varFechaHoyL"/>
+                </FechaHoy>
+                <MENSAJE>
+                    <xsl:value-of select="if(tib:compare-dateTime( $varFechaUltimaTef,$varFechaHoyL)=1) then ('Cumple Regla 2, Mayor a 72 hrs')&#xA;else ('')"/>
+                </MENSAJE>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Regla500">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>569</pd:x>
+        <pd:y>206</pd:y>
+        <config>
+            <variableName>Regla3</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <Mnt_Tef_Acm>
+                    <xsl:value-of select="$CL1SPSQL_CONMontoAcumuladoTef/ns4:outputset/ns4:Resultsets/ns4:ResultSet1/ns4:Record1/ns4:mnt_tef_acm"/>
+                </Mnt_Tef_Acm>
+                <OTP>
+                    <xsl:value-of select="if($CL1SPSQL_CONMontoAcumuladoTef/ns4:outputset/ns4:Resultsets/ns4:ResultSet1/ns4:Record1/ns4:mnt_tef_acm=0) then ('NO')&#xA;else ('SI')"/>
+                </OTP>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Regla501">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>809</pd:x>
+        <pd:y>160</pd:y>
+        <config>
+            <variableName>Regla3_1</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:variable name="varRecuperaDatoscda" select="round($CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1[pfx:COD_PCA=501]/pfx:VAL_PMT)"/>
+                <Mnt_Tef_Acm>
+                    <xsl:value-of select="$CL1SPSQL_CONMontoAcumuladoTef/ns4:outputset/ns4:Resultsets/ns4:ResultSet1/ns4:Record1/ns4:mnt_tef_acm"/>
+                </Mnt_Tef_Acm>
+                <OTP>
+                    <xsl:value-of select="if($CL1SPSQL_CONMontoAcumuladoTef/ns4:outputset/ns4:Resultsets/ns4:ResultSet1/ns4:Record1/ns4:mnt_tef_acm>$varRecuperaDatoscda)&#xA;then ('SI')&#xA;else ('NO')"/>
+                </OTP>
+                <MENSAJE>
+                    <xsl:value-of select="if($CL1SPSQL_CONMontoAcumuladoTef/ns4:outputset/ns4:Resultsets/ns4:ResultSet1/ns4:Record1/ns4:mnt_tef_acm>$varRecuperaDatoscda)&#xA;then ('Cumple Regla 3, Acumulado 24 hrs')&#xA;else ('')"/>
+                </MENSAJE>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="VerificaMonto">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>475</pd:x>
+        <pd:y>83</pd:y>
+        <config>
+            <variableName>Monto</variableName>
+        </config>
+        <pd:inputBindings>
+            <xsl:choose>
+                <xsl:when test="$Regla1/root/Cod_Pca=441">
+                    <group>
+                        <OTP>
+                            <xsl:value-of select="if($Start/pfx2:inputSet/pfx2:mnt_tef>$CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1[pfx:COD_PCA=441]/pfx:VAL_PMT)&#xA;then ('SI')&#xA;else ('NO')"/>
+                        </OTP>
+                        <MENSAJE>
+                            <xsl:value-of select="if($Start/pfx2:inputSet/pfx2:mnt_tef>$CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1[pfx:COD_PCA=441]/pfx:VAL_PMT)&#xA;then ('Cumple Regla1, Menor a 72 hrs')&#xA;else ('')"/>
+                        </MENSAJE>
+                    </group>
+                </xsl:when>
+                <xsl:otherwise>
+                    <group>
+                        <OTP>
+                            <xsl:value-of select="if($Start/pfx2:inputSet/pfx2:mnt_tef>$CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1[pfx:COD_PCA=442]/pfx:VAL_PMT)&#xA;then ('SI')&#xA;else ('NO')"/>
+                        </OTP>
+                        <MENSAJE>
+                            <xsl:value-of select="if($Start/pfx2:inputSet/pfx2:mnt_tef>$CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1[pfx:COD_PCA=442]/pfx:VAL_PMT)&#xA;then ('Cumple Regla 2, Mayor a 72 hrs')&#xA;else ('')"/>
+                        </MENSAJE>
+                    </group>
+                </xsl:otherwise>
+            </xsl:choose>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="PoliticasCDA">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>332</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <variableName>CDA</variableName>
+        </config>
+        <pd:inputBindings>
+            <xsl:variable name="var411" select="''"/>
+            <root>
+                <OTP>
+                    <xsl:value-of select="if(($CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1/pfx:COD_PCA=440) and&#xA; ($CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1/pfx:COD_PCA=441) and&#xA;($CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1/pfx:COD_PCA=442) and&#xA;($CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1/pfx:COD_PCA=500) and&#xA;($CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1/pfx:COD_PCA=501)) &#xA;then ('SI')&#xA;else ('NO')"/>
+                </OTP>
+                <MENSAJE>
+                    <xsl:value-of select="if(($CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1/pfx:COD_PCA=440) and&#xA; ($CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1/pfx:COD_PCA=441) and&#xA;($CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1/pfx:COD_PCA=442) and&#xA;($CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1/pfx:COD_PCA=500) and&#xA;($CL1SPORAC_CONPoliticasPersonasPRSNA/pfx:outputSET/pfx:ResultSet1/pfx:Record1/pfx:COD_PCA=501)) &#xA;then ('')&#xA;else ('POLITICAS APAGADAS')"/>
+                </MENSAJE>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ControlDeErroresCatch</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ControlDeErroresCatch</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>CL1SPSQL_CONFechaMontoUltimaTef</pd:from>
+        <pd:to>CL1SPSQL_CONMontoAcumuladoTef</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>CL1SPSQL_CONMontoAcumuladoTef</pd:from>
+        <pd:to>Regla1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Regla1</pd:from>
+        <pd:to>Regla2</pd:to>
+        <pd:xpathDescription>OTP NO</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Regla1/root/OTP='NO'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Regla1</pd:from>
+        <pd:to>VerificaMonto</pd:to>
+        <pd:xpathDescription>OTP SI</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Regla1/root/OTP='SI' and $Regla1/root/Cod_Pca=441</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>VerificaMonto</pd:from>
+        <pd:to>End</pd:to>
+        <pd:xpathDescription>OTP SI</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Monto/group/OTP='SI'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Regla500</pd:from>
+        <pd:to>End</pd:to>
+        <pd:xpathDescription>OTP NO</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Regla3/root/OTP='NO'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Regla2</pd:from>
+        <pd:to>VerificaMonto</pd:to>
+        <pd:xpathDescription>OTP SI/NO</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Regla2/root/OTP='NO' or $Regla2/root/OTP='SI'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>VerificaMonto</pd:from>
+        <pd:to>Regla500</pd:to>
+        <pd:xpathDescription>OTP NO</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Monto/group/OTP='NO'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Regla500</pd:from>
+        <pd:to>Regla501</pd:to>
+        <pd:xpathDescription>OTP SI</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Regla3/root/OTP='SI'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Regla501</pd:from>
+        <pd:to>End</pd:to>
+        <pd:xpathDescription>OTP SI/NO</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Regla3/root/OTP='SI'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>CL1SPORAC_CONPoliticasPersonasPRSNA</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>PoliticasCDA</pd:from>
+        <pd:to>CL1SPSQL_CONFechaMontoUltimaTef</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$CDA/root/OTP='SI'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>PoliticasCDA</pd:from>
+        <pd:to>End</pd:to>
+        <pd:xpathDescription>Politicas Apagadas</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$CDA/root/OTP='NO'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>CL1SPORAC_CONPoliticasPersonasPRSNA</pd:from>
+        <pd:to>PoliticasCDA</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:ns3="http://www.tibco.com/pe/EngineTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Resources/Schemas/CDATA_BeneficiarioNuevoPreLife.xsd" xmlns:ns12="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/SPORAC_CONMontoAcumulado.xsd" xmlns:ns6="http://www.tibco.com/schemas/AppGenericosGeneral2/Resources/Schemas/UserInfoEX.xsd" xmlns:pfx="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/BeneficiarioNuevo.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" schemaLocation="/Resources/Schemas/Informacion.xsd"/>
+    <xsd:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/BeneficiarioNuevo.xsd" schemaLocation="/Resources/Schemas/BeneficiarioNuevo.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Resources/Schemas/CDATA_BeneficiarioNuevoPreLife.xsd" schemaLocation="/Resources/Schemas/CDATA_BeneficiarioNuevoPreLife.xsd"/>
+    <pd:name>Process/Main/CL1CO_CONBeneficiarioNuevoPreLife.process</pd:name>
+    <pd:description>3ra version</pd:description>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:INPUT"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>35</pd:startY>
+    <pd:returnBindings>
+        <pfx:OUTPUT>
+            <xsl:choose>
+                <xsl:when test="string($Catch/exceptiondata/*)!=''">
+                    <pfx:INFORMACION>
+                        <pfx:CODIGO>
+                            <xsl:value-of select="$ControlDeErrores/ns1:Informacion/ns1:Codigo"/>
+                        </pfx:CODIGO>
+                        <pfx:RESULTADO>
+                            <xsl:value-of select="$ControlDeErrores/ns1:Informacion/ns1:Resultado"/>
+                        </pfx:RESULTADO>
+                        <pfx:MENSAJE>
+                            <xsl:value-of select="$ControlDeErrores/ns1:Informacion/ns1:Mensaje"/>
+                        </pfx:MENSAJE>
+                    </pfx:INFORMACION>
+                    <pfx:RECOMENDACION>
+                        <xsl:value-of select="'ERROR'"/>
+                    </pfx:RECOMENDACION>
+                </xsl:when>
+                <!--PRE LIFE-->
+                <xsl:when test="$Validacion-Beneficiario-Nuevo/root/Recomendacion='Allow' and $Cliente-PreLife/root/ClientePreLife='true'">
+                    <pfx:INFORMACION>
+                        <pfx:CODIGO>
+                            <xsl:value-of select="$Consulta-acumulado-mensual/ns12:outputSet/ns1:Informacion/ns1:Codigo"/>
+                        </pfx:CODIGO>
+                        <pfx:RESULTADO>
+                            <xsl:value-of select="concat($Consulta-acumulado-mensual/ns12:outputSet/ns1:Informacion/ns1:Resultado,' - IndicadorBN=',&#xA;substring-after($Validacion-Beneficiario-Nuevo/root/ns1:Informacion/ns1:Resultado, 'IndicadorBN='))"/>
+                        </pfx:RESULTADO>
+                        <pfx:MENSAJE>
+                            <xsl:value-of select="if ($Consulta-acumulado-mensual/ns12:outputSet/ns1:Informacion/ns1:Codigo=$_globalVariables/ns2:GlobalVariables/INFO/CodigoError) &#xA;then $Consulta-acumulado-mensual/ns12:outputSet/ns1:Informacion/ns1:Mensaje&#xA;else $Validacion-Beneficiario-Nuevo/root/ns1:Informacion/ns1:Mensaje"/>
+                        </pfx:MENSAJE>
+                    </pfx:INFORMACION>
+                    <xsl:variable name="MONTO_POLITICA_PRELIFE" select="$Validacion-Beneficiario-Nuevo/root/MontoPoliticaPreLife"/>
+                    <pfx:RECOMENDACION>
+                        <xsl:value-of select="if (($Consulta-acumulado-mensual/ns12:outputSet/ns12:OUT_MNT_TRNCN_ACM+number($Parse-XML/DATA/MONTO_TEF)) &lt;= $MONTO_POLITICA_PRELIFE) then 'Allow'&#xA;else if (($Consulta-acumulado-mensual/ns12:outputSet/ns12:OUT_MNT_TRNCN_ACM+number($Parse-XML/DATA/MONTO_TEF)) > $MONTO_POLITICA_PRELIFE) then 'Decline'&#xA;else 'ERROR'"/>
+                    </pfx:RECOMENDACION>
+                </xsl:when>
+                <!--SOLO BENEFICIARIO NUEVO-->
+                <xsl:otherwise>
+                    <pfx:INFORMACION>
+                        <pfx:CODIGO>
+                            <xsl:value-of select="$Validacion-Beneficiario-Nuevo/root/ns1:Informacion/ns1:Codigo"/>
+                        </pfx:CODIGO>
+                        <pfx:RESULTADO>
+                            <xsl:value-of select="$Validacion-Beneficiario-Nuevo/root/ns1:Informacion/ns1:Resultado"/>
+                        </pfx:RESULTADO>
+                        <pfx:MENSAJE>
+                            <xsl:value-of select="$Validacion-Beneficiario-Nuevo/root/ns1:Informacion/ns1:Mensaje"/>
+                        </pfx:MENSAJE>
+                    </pfx:INFORMACION>
+                    <pfx:RECOMENDACION>
+                        <xsl:value-of select="$Validacion-Beneficiario-Nuevo/root/Recomendacion"/>
+                    </pfx:RECOMENDACION>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:variable name="varMecanismos" select="$Consulta-si-el-cliente-tiene-super-clave/Salida/ns6:userInfoExResponse/ns6:challengeList/*"/>
+            <pfx:MECANISMO_SEGURIDAD>
+                <xsl:value-of select="if ($Cliente-PreLife/root/ClientePreLife='true') then 'OTP' else 'SUPER_CLAVE'"/>
+            </pfx:MECANISMO_SEGURIDAD>
+            <xsl:for-each select="$Validacion-Beneficiario-Nuevo/root/Politicas">
+                <pfx:POLITICAS>
+                    <pfx:CODIGO>
+                        <xsl:value-of select="codigo"/>
+                    </pfx:CODIGO>
+                    <pfx:VALOR>
+                        <xsl:value-of select="valor"/>
+                    </pfx:VALOR>
+                    <pfx:DESCRIPCION>
+                        <xsl:value-of select="descripcion"/>
+                    </pfx:DESCRIPCION>
+                    <pfx:VALOR_FORMATEADO>
+                        <xsl:value-of select="valorFormateado"/>
+                    </pfx:VALOR_FORMATEADO>
+                </pfx:POLITICAS>
+            </xsl:for-each>
+        </pfx:OUTPUT>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx:OUTPUT"/>
+    <pd:endX>642</pd:endX>
+    <pd:endY>35</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Process/Main/CL1CO_CONBeneficiarioNuevoPreLife</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>978</pd:x>
+        <pd:y>35</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+            <fault>localname=ValidationException namespace=http://schemas.tibco.com/bw/plugins/xml/5.0/xmlExceptions</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Cliente PreLife">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>338</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <element>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="ClientePreLife" type="xsd:boolean"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <ClientePreLife>
+                    <xsl:value-of select="$Consulta-si-el-cliente-tiene-super-clave/Salida/ns1:Informacion/ns1:Codigo=$_globalVariables/ns2:GlobalVariables/INFO/CodigoOk and &#xA;count($Consulta-si-el-cliente-tiene-super-clave/Salida/ns6:userInfoExResponse/ns6:challengeList/ns6:challenges[ns6:nameSet='GRID'])=0"/>
+                </ClientePreLife>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Consulta acumulado mensual">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:description>Validacion PreLife</pd:description>
+        <pd:x>642</pd:x>
+        <pd:y>147</pd:y>
+        <config>
+            <processName>/Process/SubProcess/CL1SPORAC_CONMontoAcumulado.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns12:inputSet>
+                <ns12:IN_COD_CNL_LGC>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:CANAL_LGC"/>
+                </ns12:IN_COD_CNL_LGC>
+                <ns12:IN_COD_FNC>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:COD_FUNCIONALIDAD"/>
+                </ns12:IN_COD_FNC>
+                <ns12:IN_COD_TPO_FNC>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:TIPO_FUNCIONALIDAD"/>
+                </ns12:IN_COD_TPO_FNC>
+                <ns12:IN_RUT_CLNTE>
+                    <xsl:value-of select="$Parse-XML/DATA/RUT_CARGO"/>
+                </ns12:IN_RUT_CLNTE>
+            </ns12:inputSet>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Consulta si el cliente tiene super clave">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>202</pd:x>
+        <pd:y>178</pd:y>
+        <config>
+            <processName>/Process/SubProcess/WSUSERINFOEX-ConConsultaCurusConnect.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <ipAdress>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:IP_SERVIDOR"/>
+                </ipAdress>
+                <rutCliente>
+                    <xsl:value-of select="$Parse-XML/DATA/RUT_CARGO"/>
+                </rutCliente>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ControlDeErrores">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>806</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <processName>/Process/SubProcess/ControlDeErrores.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <elemento>
+                    <xsl:value-of select="''"/>
+                </elemento>
+                <xsl:copy-of select="$_error/ns3:ErrorReport"/>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>201</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>true</validateOutput>
+            <term ref="pfx2:DATA"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="concat('&lt;DATA>',$Start/pfx:INPUT/pfx:DATOS_TRANSACCION/pfx:DATA,'&lt;/DATA>')"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validacion Beneficiario Nuevo">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>446</pd:x>
+        <pd:y>43</pd:y>
+        <config>
+            <processName>/Process/SubProcess/ValidacionBeneficiarioNuevo.process</processName>
+        </config>
+        <pd:inputBindings>
+            <Entrada>
+                <CANAL_LGC>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:CANAL_LGC"/>
+                </CANAL_LGC>
+                <USUARIO_ALT>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:USUARIO_ALT"/>
+                </USUARIO_ALT>
+                <COD_FUNCIONALIDAD>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:COD_FUNCIONALIDAD"/>
+                </COD_FUNCIONALIDAD>
+                <TIPO_FUNCIONALIDAD>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:TIPO_FUNCIONALIDAD"/>
+                </TIPO_FUNCIONALIDAD>
+                <CODIGO_MONEDA>
+                    <xsl:value-of select="'CLP'"/>
+                </CODIGO_MONEDA>
+                <ControlBeneficiarioNuevo>
+                    <RUT_CARGO>
+                        <xsl:value-of select="$Parse-XML/DATA/RUT_CARGO"/>
+                    </RUT_CARGO>
+                    <RUT_ABONO>
+                        <xsl:value-of select="$Parse-XML/DATA/RUT_ABONO"/>
+                    </RUT_ABONO>
+                    <CUENTA_ABONO>
+                        <xsl:value-of select="$Parse-XML/DATA/CUENTA_ABONO"/>
+                    </CUENTA_ABONO>
+                    <FECHA_TEF>
+                        <xsl:value-of select="$Parse-XML/DATA/FECHA_TEF"/>
+                    </FECHA_TEF>
+                    <MONTO_TEF>
+                        <xsl:value-of select="$Parse-XML/DATA/MONTO_TEF"/>
+                    </MONTO_TEF>
+                </ControlBeneficiarioNuevo>
+                <ClientePreLife>
+                    <xsl:value-of select="$Cliente-PreLife/root/ClientePreLife"/>
+                </ClientePreLife>
+            </Entrada>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ControlDeErrores</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Cliente PreLife</pd:to>
+        <pd:xpathDescription/>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validacion Beneficiario Nuevo</pd:from>
+        <pd:to>Consulta acumulado mensual</pd:to>
+        <pd:xpathDescription>Pre-Life</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Validacion-Beneficiario-Nuevo/root/Recomendacion='Allow' and $Cliente-PreLife/root/ClientePreLife='true'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ControlDeErrores</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validacion Beneficiario Nuevo</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Consulta acumulado mensual</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Consulta si el cliente tiene super clave</pd:to>
+        <pd:xpathDescription>PreLife</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Parse-XML/DATA/CODIGO_PRODUCTO=$_globalVariables/ns2:GlobalVariables/PRELIFE/Producto and 
+$Parse-XML/DATA/CODIGO_SUBPRODUCTO=$_globalVariables/ns2:GlobalVariables/PRELIFE/SubProducto</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Consulta si el cliente tiene super clave</pd:from>
+        <pd:to>Cliente PreLife</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Cliente PreLife</pd:from>
+        <pd:to>Validacion Beneficiario Nuevo</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:label>
+        <pd:name>Label</pd:name>
+        <pd:description>Sólo en el caso que no tenga asociada tarjeta de coordenadas: 
+&gt; Debe aplicar la restricción: “Permitir realizar la TEF sólo si no supera un 
+monto X mensual que estará definido en Amps”.
+&gt; El acumulado mensual es a mes calendario, por ejemplo, si el cliente abre 
+su cuenta pre life el día 28 de enero, el acumulado mensual de enero 
+corresponderá a la suma de tef que el cliente realice entre los días 
+28 al 31 de enero, a partir del 1 de febrero (a las 00:00 hrs) el acumulado 
+mensual partirá en cero.  
+&gt; Debe solicitar clave 3.0
+&gt; Estas políticas deben ser aplicadas con posterioridad a la validación que 
+tenemos para 1era TEF.
+</pd:description>
+        <pd:x>971</pd:x>
+        <pd:y>200</pd:y>
+        <pd:width>445</pd:width>
+        <pd:height>192</pd:height>
+        <pd:fontName>Dialog.plain-plain-12</pd:fontName>
+        <pd:fontColor>-16777216</pd:fontColor>
+        <pd:color>-52</pd:color>
+        <pd:type>solid</pd:type>
+        <pd:thickness>0</pd:thickness>
+        <pd:fade>false</pd:fade>
+    </pd:label>
+    <pd:label>
+        <pd:name>Label (1)</pd:name>
+        <pd:description>Elimina campos choice de entrada
+MODO_CONSULTA y MODO_EVALUACION
+
+Expone solo un binding
+wsCL1CO_CONBeneficiarioNuevo</pd:description>
+        <pd:x>131</pd:x>
+        <pd:y>277</pd:y>
+        <pd:width>253</pd:width>
+        <pd:height>100</pd:height>
+        <pd:fontColor>-16777216</pd:fontColor>
+        <pd:color>-52</pd:color>
+        <pd:type>solid</pd:type>
+        <pd:thickness>0</pd:thickness>
+        <pd:fade>false</pd:fade>
+    </pd:label>
+</pd:ProcessDefinition>

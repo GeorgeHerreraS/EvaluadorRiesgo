@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	 xmlns="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/ConsultaPoliticas.xsd"
+	 targetNamespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/ConsultaPoliticas.xsd"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+	<xs:element name="INPUT">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="CANAL_LGC" type="xs:string"/>
+				<xs:element name="COD_FUNCIONALIDAD" type="xs:string"/>
+				<xs:element name="TIPO_FUNCIONALIDAD" type="xs:string"/>
+				<xs:element name="PRELIFE" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="RUT_CLIENTE" type="xs:string"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OUTPUT">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="INFORMACION">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODIGO" type="xs:string" nillable="true"/>
+							<xs:element name="RESULTADO" type="xs:string" nillable="true"/>
+							<xs:element name="MENSAJE" type="xs:string" nillable="true"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="OUT_FLG_EST_FNC" type="xs:string" minOccurs="0"/>
+				<xs:element name="WS_WARNING" type="xs:string" minOccurs="0"/>
+				<xs:element name="MONTO_ACUMULADO" type="xs:string" minOccurs="0"/>
+				<xs:element name="MONTO_DISPONIBLE" type="xs:string" minOccurs="0"/>
+				<xs:element name="POLITICAS" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODIGO" type="xs:string"/>
+							<xs:element name="VALOR" type="xs:string"/>
+							<xs:element name="DESCRIPCION" type="xs:string"/>
+							<xs:element name="VALOR_FORMATEADO" type="xs:string"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

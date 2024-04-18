@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pfx6="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/CONEVALUADORDERIESGO.xsd" xmlns:pfx7="http://www.tibco.com/schemas/APPEVALUADORRIESGO_PERSONA_DEV/Resources/Schemas/CONEVALUADORDERIESGO.xsd" xmlns:pfx="http://www.tibco.com/schemas/src/Resources/Schemas/Schema.xsd" xmlns:pfx2="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/ConsultaPoliticas.xsd" xmlns:ns="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/BeneficiarioNuevo.xsd" xmlns:pfx3="http://www.tibco.com/schemas/APPEVALUADORRIESGO_PERSONA_DEV/Resources/Schemas/Schema.xsd" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Resources/Schemas/CDATA_BeneficiarioNuevo.xsd" xmlns:pfx5="http://www.tibco.com/ns/no_namespace_schema_location/Resources/Schemas/CDATA_CONEVALUADORDERIESGO.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003">
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Resources/Schemas/CDATA_BeneficiarioNuevo.xsd" schemaLocation="/Resources/Schemas/CDATA_BeneficiarioNuevo.xsd"/>
+    <xsd:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/CONEVALUADORDERIESGO.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Resources/Schemas/CDATA_CONEVALUADORDERIESGO.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Resources/Schemas/CDATA_CONEVALUADORDERIESGO.xsd" schemaLocation="/Resources/Schemas/CDATA_CONEVALUADORDERIESGO.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/schemas/APPEVALUADORRIESGO_PERSONA_DEV/Resources/Schemas/CONEVALUADORDERIESGO.xsd" schemaLocation="/Resources/Schemas/CONEVALUADORDERIESGO.xsd"/>
+    <pd:name>Process/Main/CL1CO_CONEVALUADORDERIESGO.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx7:INPUT"/>
+    <pd:startX>34</pd:startX>
+    <pd:startY>49</pd:startY>
+    <pd:returnBindings>
+        <xsl:choose>
+            <xsl:when test="$CL1CO_CONBeneficiarioNuevoACT/ns:OUTPUT/ns:RECOMENDACION='Allow'">
+                <pfx7:OUTPUT>
+                    <pfx7:INFORMACION>
+                        <pfx7:CODIGO>
+                            <xsl:value-of select="if($CL1CO_CONBANCORIESGOSO/pfx:output/ns2:Informacion/ns2:Codigo>0)&#xA;then ($CL1CO_CONBANCORIESGOSO/pfx:output/ns2:Informacion/ns2:Codigo)&#xA;else ('00')"/>
+                        </pfx7:CODIGO>
+                        <pfx7:RESULTADO>
+                            <xsl:value-of select="$CL1CO_CONBANCORIESGOSO/pfx:output/ns2:Informacion/ns2:Resultado"/>
+                        </pfx7:RESULTADO>
+                        <pfx7:MENSAJE>
+                            <xsl:value-of select="$CL1CO_CONBANCORIESGOSO/pfx:output/ns2:Informacion/ns2:Mensaje"/>
+                        </pfx7:MENSAJE>
+                    </pfx7:INFORMACION>
+                    <pfx7:RECOMENDACION>
+                        <xsl:value-of select="if($CL1CO_CONBANCORIESGOSO/pfx:output/pfx:OTP='NO')&#xA;then ('Allow')&#xA;else ('Challenge')"/>
+                    </pfx7:RECOMENDACION>
+                    <pfx7:POLITICAS>
+                        <pfx7:CODIGO>
+                            <xsl:value-of select="00"/>
+                        </pfx7:CODIGO>
+                        <pfx7:VALOR>
+                            <xsl:value-of select="0"/>
+                        </pfx7:VALOR>
+                        <pfx7:DESCRIPCION>
+                            <xsl:value-of select="$CL1CO_CONBANCORIESGOSO/pfx:output/pfx:MENSAJE"/>
+                        </pfx7:DESCRIPCION>
+                        <pfx7:VALOR>
+                            <xsl:value-of select="0"/>
+                        </pfx7:VALOR>
+                    </pfx7:POLITICAS>
+                </pfx7:OUTPUT>
+            </xsl:when>
+            <xsl:otherwise>
+                <pfx7:OUTPUT>
+                    <pfx7:INFORMACION>
+                        <pfx7:CODIGO>
+                            <xsl:value-of select="$CL1CO_CONBeneficiarioNuevoACT/ns:OUTPUT/ns:INFORMACION/ns:CODIGO"/>
+                        </pfx7:CODIGO>
+                        <pfx7:RESULTADO>
+                            <xsl:value-of select="$CL1CO_CONBeneficiarioNuevoACT/ns:OUTPUT/ns:INFORMACION/ns:RESULTADO"/>
+                        </pfx7:RESULTADO>
+                        <pfx7:MENSAJE>
+                            <xsl:value-of select="$CL1CO_CONBeneficiarioNuevoACT/ns:OUTPUT/ns:INFORMACION/ns:MENSAJE"/>
+                        </pfx7:MENSAJE>
+                    </pfx7:INFORMACION>
+                    <pfx7:RECOMENDACION>
+                        <xsl:value-of select="$CL1CO_CONBeneficiarioNuevoACT/ns:OUTPUT/ns:RECOMENDACION"/>
+                    </pfx7:RECOMENDACION>
+                    <xsl:for-each select="$CL1CO_CONBeneficiarioNuevoACT/ns:OUTPUT/ns:POLITICAS">
+                        <pfx7:POLITICAS>
+                            <pfx7:CODIGO>
+                                <xsl:value-of select="ns:CODIGO"/>
+                            </pfx7:CODIGO>
+                            <pfx7:DESCRIPCION>
+                                <xsl:value-of select="ns:DESCRIPCION"/>
+                            </pfx7:DESCRIPCION>
+                            <pfx7:VALOR>
+                                <xsl:value-of select="ns:VALOR"/>
+                            </pfx7:VALOR>
+                        </pfx7:POLITICAS>
+                    </xsl:for-each>
+                </pfx7:OUTPUT>
+            </xsl:otherwise>
+        </xsl:choose>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx7:OUTPUT"/>
+    <pd:endX>630</pd:endX>
+    <pd:endY>35</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Process/Main/CL1CO_CONEVALUADORDERIESGO</pd:targetNamespace>
+    <pd:activity name="Map Data">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>158</pd:x>
+        <pd:y>50</pd:y>
+        <config>
+            <element ref="pfx5:DATA"/>
+        </config>
+        <pd:inputBindings>
+            <xsl:variable name="varData" select="$Start/pfx7:INPUT/pfx7:DATOS_TRANSACCION/pfx7:DATA"/>
+            <DATA>
+                <RUT_CARGO>
+                    <xsl:value-of select="substring-after(substring-before($varData, '&lt;/RUT_CARGO>'), '&lt;RUT_CARGO>')"/>
+                </RUT_CARGO>
+                <CUENTA_CARGO>
+                    <xsl:value-of select="substring-after(substring-before($varData, '&lt;/CUENTA_CARGO>'), '&lt;CUENTA_CARGO>')"/>
+                </CUENTA_CARGO>
+                <RUT_ABONO>
+                    <xsl:value-of select="substring-after(substring-before($varData, '&lt;/RUT_ABONO>'), '&lt;RUT_ABONO>')"/>
+                </RUT_ABONO>
+                <CUENTA_ABONO>
+                    <xsl:value-of select="substring-after(substring-before($varData, '&lt;/CUENTA_ABONO>'), '&lt;CUENTA_ABONO>')"/>
+                </CUENTA_ABONO>
+                <MONTO_TEF>
+                    <xsl:value-of select="substring-after(substring-before($varData, '&lt;/MONTO_TEF>'), '&lt;MONTO_TEF>')"/>
+                </MONTO_TEF>
+                <FECHA_TEF>
+                    <xsl:value-of select="substring-after(substring-before($varData, '&lt;/FECHA_TEF>'), '&lt;FECHA_TEF>')"/>
+                </FECHA_TEF>
+            </DATA>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="CL1CO_CONBeneficiarioNuevoACT">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>319</pd:x>
+        <pd:y>42</pd:y>
+        <config>
+            <processName>/Process/Main/CL1CO_CONBeneficiarioNuevoACT.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns:INPUT>
+                <ns:DATOS_AMBIENTE>
+                    <ns:APLICATIVO>
+                        <xsl:value-of select="$Start/pfx7:INPUT/pfx7:DATOS_AMBIENTE/pfx7:APLICATIVO"/>
+                    </ns:APLICATIVO>
+                    <ns:CANAL_LGC>
+                        <xsl:value-of select="$Start/pfx7:INPUT/pfx7:DATOS_AMBIENTE/pfx7:CANAL_LGC"/>
+                    </ns:CANAL_LGC>
+                    <ns:USUARIO_ALT>
+                        <xsl:value-of select="$Start/pfx7:INPUT/pfx7:DATOS_AMBIENTE/pfx7:USUARIO_ALT"/>
+                    </ns:USUARIO_ALT>
+                    <ns:IP_SERVIDOR>
+                        <xsl:value-of select="$Start/pfx7:INPUT/pfx7:DATOS_AMBIENTE/pfx7:IP_SERVIDOR"/>
+                    </ns:IP_SERVIDOR>
+                    <ns:COD_FUNCIONALIDAD>
+                        <xsl:value-of select="$Start/pfx7:INPUT/pfx7:DATOS_AMBIENTE/pfx7:COD_FUNCIONALIDAD"/>
+                    </ns:COD_FUNCIONALIDAD>
+                    <ns:TIPO_FUNCIONALIDAD>
+                        <xsl:value-of select="$Start/pfx7:INPUT/pfx7:DATOS_AMBIENTE/pfx7:TIPO_FUNCIONALIDAD"/>
+                    </ns:TIPO_FUNCIONALIDAD>
+                </ns:DATOS_AMBIENTE>
+                <ns:DATOS_TRANSACCION>
+                    <ns:DATA>
+                        <xsl:value-of select="$Start/pfx7:INPUT/pfx7:DATOS_TRANSACCION/pfx7:DATA"/>
+                    </ns:DATA>
+                </ns:DATOS_TRANSACCION>
+            </ns:INPUT>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="CL1CO_CONBANCORIESGOSO">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>468</pd:x>
+        <pd:y>108</pd:y>
+        <config>
+            <processName>/Process/Main/CL1CO_CONBANCORIESGOSO.process</processName>
+        </config>
+        <pd:inputBindings>
+            <pfx:inputSet>
+                <pfx:IN_COD_CNL_LGC>
+                    <xsl:value-of select="$Start/pfx7:INPUT/pfx7:DATOS_AMBIENTE/pfx7:CANAL_LGC"/>
+                </pfx:IN_COD_CNL_LGC>
+                <pfx:IN_COD_FNC>
+                    <xsl:value-of select="$Start/pfx7:INPUT/pfx7:DATOS_AMBIENTE/pfx7:COD_FUNCIONALIDAD"/>
+                </pfx:IN_COD_FNC>
+                <pfx:IN_COD_TPO_FNC>
+                    <xsl:value-of select="$Start/pfx7:INPUT/pfx7:DATOS_AMBIENTE/pfx7:TIPO_FUNCIONALIDAD"/>
+                </pfx:IN_COD_TPO_FNC>
+                <pfx:IN_TPO_MND>
+                    <xsl:value-of select="'CLP'"/>
+                </pfx:IN_TPO_MND>
+                <pfx:IN_COD_SGM>
+                    <xsl:value-of select="000"/>
+                </pfx:IN_COD_SGM>
+                <pfx:COD_BCO_RSG>
+                    <xsl:value-of select="$Start/pfx7:INPUT/pfx7:DATOS_AMBIENTE/pfx7:COD_BCO_RSG"/>
+                </pfx:COD_BCO_RSG>
+                <pfx:nro_doc_cgo>
+                    <xsl:value-of select="$Map-Data/DATA/RUT_CARGO"/>
+                </pfx:nro_doc_cgo>
+                <pfx:nro_cta_cgo_usr_innet>
+                    <xsl:value-of select="$Map-Data/DATA/CUENTA_CARGO"/>
+                </pfx:nro_cta_cgo_usr_innet>
+                <pfx:nro_doc_abn>
+                    <xsl:value-of select="$Map-Data/DATA/RUT_ABONO"/>
+                </pfx:nro_doc_abn>
+                <pfx:nro_cta_abn>
+                    <xsl:value-of select="$Map-Data/DATA/CUENTA_ABONO"/>
+                </pfx:nro_cta_abn>
+                <pfx:mnt_tef>
+                    <xsl:value-of select="$Map-Data/DATA/MONTO_TEF"/>
+                </pfx:mnt_tef>
+                <pfx:fch_hra_cgo>
+                    <xsl:value-of select="$Map-Data/DATA/FECHA_TEF"/>
+                </pfx:fch_hra_cgo>
+            </pfx:inputSet>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>937</pd:x>
+        <pd:y>52</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+            <fault>localname=ValidationException namespace=http://schemas.tibco.com/bw/plugins/xml/5.0/xmlExceptions</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ControlDeErrores">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>791</pd:x>
+        <pd:y>49</pd:y>
+        <config>
+            <processName>/Process/SubProcess/ControlDeErrores.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <elemento>
+                    <xsl:value-of select="''"/>
+                </elemento>
+                <xsl:copy-of select=""/>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>CL1CO_CONBeneficiarioNuevoACT</pd:from>
+        <pd:to>CL1CO_CONBANCORIESGOSO</pd:to>
+        <pd:xpathDescription>Allow</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$CL1CO_CONBeneficiarioNuevoACT/ns:OUTPUT/ns:RECOMENDACION='Allow'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>CL1CO_CONBANCORIESGOSO</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>CL1CO_CONBeneficiarioNuevoACT</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Map Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data</pd:from>
+        <pd:to>CL1CO_CONBeneficiarioNuevoACT</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ControlDeErrores</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ControlDeErrores</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

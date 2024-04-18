@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+	<xs:element name="Record1">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="ind_tef" type="xs:string"/>
+				<xs:element name="fch_hra_lnz_trn" type="xs:string" nillable="true"/>
+				<xs:element name="mnt_tef" type="xs:string" nillable="true"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

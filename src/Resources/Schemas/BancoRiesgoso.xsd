@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	 xmlns="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/BancoRiesgoso.xsd"
+	 xmlns:ns0="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd"
+	 targetNamespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/BancoRiesgoso.xsd"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+	<xs:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" schemaLocation="Informacion.xsd"/>
+	<xs:element name="inputSet">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="IN_COD_CNL_LGC" type="xs:string"/>
+				<xs:element name="IN_COD_FNC" type="xs:string"/>
+				<xs:element name="IN_COD_TPO_FNC" type="xs:string"/>
+				<xs:element name="IN_TPO_MND" type="xs:string"/>
+				<xs:element name="IN_COD_SGM" type="xs:string"/>
+				<xs:element name="COD_BCO_RSG" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="outputSET">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ns0:Informacion"/>
+				<xs:element name="OUT_FLG_EST_FNC" type="xs:string" minOccurs="0"/>
+				<xs:element name="OUT_FLG_EST_PCA" type="xs:string" minOccurs="0"/>
+				<xs:element name="WS_WARNING" type="xs:string" minOccurs="0"/>
+				<xs:element name="ResultSet1" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Record1" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="COD_PCA" type="xs:string" minOccurs="0"/>
+										<xs:element name="VAL_PMT" type="xs:string" minOccurs="0"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

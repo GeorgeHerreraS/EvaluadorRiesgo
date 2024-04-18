@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	 xmlns="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/SumatoriaTef_BancoRiesgoso.xsd"
+	 xmlns:ns0="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd"
+	 targetNamespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/SumatoriaTef_BancoRiesgoso.xsd"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+	<xs:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" schemaLocation="Informacion.xsd"/>
+	<xs:element name="inputSet">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="nro_doc_cgo" type="xs:string"/>
+				<xs:element name="nro_doc_abn" type="xs:string"/>
+				<xs:element name="nro_cta_abn" type="xs:string"/>
+				<xs:element name="cod_bco_cca" type="xs:string"/>
+				<xs:element name="fch_hra_cgo" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="outputset">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ns0:Informacion"/>
+				<xs:element name="RETURN_VALUE" type="xs:string" minOccurs="0"/>
+				<xs:element name="Resultsets" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ResultSet1">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Record1">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="mnt_tef_acm" type="xs:string"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

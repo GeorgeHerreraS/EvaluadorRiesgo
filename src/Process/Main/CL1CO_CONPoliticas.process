@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/SPORAC_CONPoliticasDeAmbienteACT.xsd" xmlns:ns4="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/SPORAC_CONMontoAcumulado.xsd" xmlns:ns3="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/ConsultaPoliticas.xsd" xmlns:pfx="http://www.tibco.com/pe/WriteToLogActivitySchema">
+    <xsd:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/ConsultaPoliticas.xsd" schemaLocation="/Resources/Schemas/ConsultaPoliticas.xsd"/>
+    <pd:name>Process/Main/CL1CO_CONPoliticas.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx2:INPUT"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>35</pd:startY>
+    <pd:returnBindings>
+        <pfx2:OUTPUT>
+            <xsl:choose>
+                <xsl:when test="string($Catch/exceptiondata/*)!=''">
+                    <pfx2:INFORMACION>
+                        <pfx2:CODIGO>
+                            <xsl:value-of select="$ControlDeErrores/ns3:Informacion/ns3:Codigo"/>
+                        </pfx2:CODIGO>
+                        <pfx2:RESULTADO>
+                            <xsl:value-of select="$ControlDeErrores/ns3:Informacion/ns3:Resultado"/>
+                        </pfx2:RESULTADO>
+                        <pfx2:MENSAJE>
+                            <xsl:value-of select="$ControlDeErrores/ns3:Informacion/ns3:Mensaje"/>
+                        </pfx2:MENSAJE>
+                    </pfx2:INFORMACION>
+                </xsl:when>
+                <xsl:otherwise>
+                    <pfx2:INFORMACION>
+                        <pfx2:CODIGO>
+                            <xsl:value-of select="$Consulta-Politicas-De-Ambiente/ns:outputSet/ns3:Informacion/ns3:Codigo"/>
+                        </pfx2:CODIGO>
+                        <pfx2:RESULTADO>
+                            <xsl:value-of select="$Consulta-Politicas-De-Ambiente/ns:outputSet/ns3:Informacion/ns3:Resultado"/>
+                        </pfx2:RESULTADO>
+                        <pfx2:MENSAJE>
+                            <xsl:value-of select="$Consulta-Politicas-De-Ambiente/ns:outputSet/ns3:Informacion/ns3:Mensaje"/>
+                        </pfx2:MENSAJE>
+                    </pfx2:INFORMACION>
+                    <pfx2:OUT_FLG_EST_FNC>
+                        <xsl:value-of select="$Consulta-Politicas-De-Ambiente/ns:outputSet/ns:OUT_FLG_EST_FNC"/>
+                    </pfx2:OUT_FLG_EST_FNC>
+                    <pfx2:WS_WARNING>
+                        <xsl:value-of select="$Consulta-Politicas-De-Ambiente/ns:outputSet/ns:WS_WARNING"/>
+                    </pfx2:WS_WARNING>
+                    <!--PRE LIFE-->
+                    <xsl:if test="exists($Start/pfx2:INPUT/pfx2:PRELIFE/pfx2:RUT_CLIENTE)">
+                        <xsl:variable name="varMontoPoliticaPreLife" select="if (count($Consulta-Politicas-De-Ambiente/ns:outputSet/ns:ResultSet1/ns:Record1[ns:COD_PCA=333])=0) then 0&#xA;else number($Consulta-Politicas-De-Ambiente/ns:outputSet/ns:ResultSet1/ns:Record1[ns:COD_PCA=333]/ns:VAL_PMT)"/>
+                        <xsl:variable name="varAcumulado" select="number($Consulta-acumulado-mensual/ns4:outputSet/ns4:OUT_MNT_TRNCN_ACM)"/>
+                        <pfx2:MONTO_ACUMULADO>
+                            <xsl:value-of select="$varAcumulado"/>
+                        </pfx2:MONTO_ACUMULADO>
+                        <pfx2:MONTO_DISPONIBLE>
+                            <xsl:value-of select="$varMontoPoliticaPreLife - $varAcumulado"/>
+                        </pfx2:MONTO_DISPONIBLE>
+                    </xsl:if>
+                    <xsl:for-each select="if (exists($Start/pfx2:INPUT/pfx2:PRELIFE/pfx2:RUT_CLIENTE))&#xA;then $Consulta-Politicas-De-Ambiente/ns:outputSet/ns:ResultSet1/ns:Record1[ns:COD_PCA=333]&#xA;else $Consulta-Politicas-De-Ambiente/ns:outputSet/ns:ResultSet1/ns:Record1">
+                        <pfx2:POLITICAS>
+                            <pfx2:CODIGO>
+                                <xsl:value-of select="ns:COD_PCA"/>
+                            </pfx2:CODIGO>
+                            <pfx2:VALOR>
+                                <xsl:value-of select="ns:VAL_PMT"/>
+                            </pfx2:VALOR>
+                            <pfx2:DESCRIPCION>
+                                <xsl:value-of select="ns:DESCRIPCION"/>
+                            </pfx2:DESCRIPCION>
+                            <pfx2:VALOR_FORMATEADO>
+                                <xsl:value-of select="ns:VALOR_FORMATEADO"/>
+                            </pfx2:VALOR_FORMATEADO>
+                        </pfx2:POLITICAS>
+                    </xsl:for-each>
+                </xsl:otherwise>
+            </xsl:choose>
+        </pfx2:OUTPUT>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx2:OUTPUT"/>
+    <pd:endX>479</pd:endX>
+    <pd:endY>35</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Process/Main/CL1CO_CONPoliticas</pd:targetNamespace>
+    <pd:activity name="Consulta Politicas De Ambiente">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>314</pd:x>
+        <pd:y>43</pd:y>
+        <config>
+            <processName>/Process/SubProcess/CL1SPORAC_CONPoliticasDeAmbienteACT.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns:inputSet>
+                <ns:IN_COD_CNL_LGC>
+                    <xsl:value-of select="$Start/pfx2:INPUT/pfx2:CANAL_LGC"/>
+                </ns:IN_COD_CNL_LGC>
+                <ns:IN_COD_FNC>
+                    <xsl:value-of select="$Start/pfx2:INPUT/pfx2:COD_FUNCIONALIDAD"/>
+                </ns:IN_COD_FNC>
+                <ns:IN_COD_TPO_FNC>
+                    <xsl:value-of select="$Start/pfx2:INPUT/pfx2:TIPO_FUNCIONALIDAD"/>
+                </ns:IN_COD_TPO_FNC>
+                <ns:IN_TPO_MND>
+                    <xsl:value-of select="'CLP'"/>
+                </ns:IN_TPO_MND>
+                <ns:IN_COD_SGM>
+                    <xsl:value-of select="''"/>
+                </ns:IN_COD_SGM>
+            </ns:inputSet>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>731</pd:x>
+        <pd:y>35</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+            <fault>localname=ValidationException namespace=http://schemas.tibco.com/bw/plugins/xml/5.0/xmlExceptions</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ControlDeErrores">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>606</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <processName>/Process/SubProcess/ControlDeErrores.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <elemento>
+                    <xsl:value-of select="''"/>
+                </elemento>
+                <xsl:copy-of select="$_error/ns2:ErrorReport"/>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Consulta acumulado mensual">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:description>Validacion PreLife</pd:description>
+        <pd:x>329</pd:x>
+        <pd:y>161</pd:y>
+        <config>
+            <processName>/Process/SubProcess/CL1SPORAC_CONMontoAcumulado.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns4:inputSet>
+                <ns4:IN_COD_CNL_LGC>
+                    <xsl:value-of select="$Start/pfx2:INPUT/pfx2:CANAL_LGC"/>
+                </ns4:IN_COD_CNL_LGC>
+                <ns4:IN_COD_FNC>
+                    <xsl:value-of select="$Start/pfx2:INPUT/pfx2:COD_FUNCIONALIDAD"/>
+                </ns4:IN_COD_FNC>
+                <ns4:IN_COD_TPO_FNC>
+                    <xsl:value-of select="$Start/pfx2:INPUT/pfx2:TIPO_FUNCIONALIDAD"/>
+                </ns4:IN_COD_TPO_FNC>
+                <ns4:IN_RUT_CLNTE>
+                    <xsl:value-of select="$Start/pfx2:INPUT/pfx2:PRELIFE/pfx2:RUT_CLIENTE"/>
+                </ns4:IN_RUT_CLNTE>
+            </ns4:inputSet>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Consulta Politicas De Ambiente</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Consulta Politicas De Ambiente</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ControlDeErrores</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ControlDeErrores</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Consulta acumulado mensual</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Consulta acumulado mensual</pd:to>
+        <pd:xpathDescription>Pre-Life</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>exists($Start/pfx2:INPUT/pfx2:PRELIFE/pfx2:RUT_CLIENTE)</pd:xpath>
+    </pd:transition>
+</pd:ProcessDefinition>

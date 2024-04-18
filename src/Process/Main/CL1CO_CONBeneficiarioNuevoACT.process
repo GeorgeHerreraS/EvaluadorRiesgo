@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns4="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/SPSQL_CONEstadoBeneficiario.xsd" xmlns:ns="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:ns3="http://www.tibco.com/pe/EngineTypes" xmlns:ns0="http://itg.isban.cl/AppOfficeBanking/Schemas/TCFE.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Resources/Schemas/CDATA_BeneficiarioNuevo.xsd" xmlns:ns5="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/SPORAC_CONPoliticasDeAmbienteACT.xsd" xmlns:ns12="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/SPORAC_CONMontoAcumulado.xsd" xmlns:ns6="http://www.tibco.com/schemas/AppGenericosGeneral2/Resources/Schemas/UserInfoEX.xsd" xmlns:pfx="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/BeneficiarioNuevo.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/BeneficiarioNuevo.xsd" schemaLocation="/Resources/Schemas/BeneficiarioNuevo.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Resources/Schemas/CDATA_BeneficiarioNuevo.xsd" schemaLocation="/Resources/Schemas/CDATA_BeneficiarioNuevo.xsd"/>
+    <xsd:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" schemaLocation="/Resources/Schemas/Informacion.xsd"/>
+    <pd:name>Process/Main/CL1CO_CONBeneficiarioNuevoACT.process</pd:name>
+    <pd:description>2da versión, incluye:
+Consulta de clientes excepcionados para validación de primera TEF
+Validación de Rut y cuenta destino</pd:description>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:INPUT"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>35</pd:startY>
+    <pd:returnBindings>
+        <pfx:OUTPUT>
+            <xsl:choose>
+                <xsl:when test="string($Catch/exceptiondata/*)!=''">
+                    <pfx:INFORMACION>
+                        <pfx:CODIGO>
+                            <xsl:value-of select="$ControlDeErrores/ns1:Informacion/ns1:Codigo"/>
+                        </pfx:CODIGO>
+                        <pfx:RESULTADO>
+                            <xsl:value-of select="$ControlDeErrores/ns1:Informacion/ns1:Resultado"/>
+                        </pfx:RESULTADO>
+                        <pfx:MENSAJE>
+                            <xsl:value-of select="$ControlDeErrores/ns1:Informacion/ns1:Mensaje"/>
+                        </pfx:MENSAJE>
+                    </pfx:INFORMACION>
+                    <pfx:RECOMENDACION>
+                        <xsl:value-of select="'ERROR'"/>
+                    </pfx:RECOMENDACION>
+                </xsl:when>
+                <!--CONSULTA POLITICAS-->
+                <xsl:when test="exists($Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:MODO_CONSULTA)">
+                    <pfx:INFORMACION>
+                        <pfx:CODIGO>
+                            <xsl:value-of select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns1:Informacion/ns1:Codigo"/>
+                        </pfx:CODIGO>
+                        <pfx:RESULTADO>
+                            <xsl:value-of select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns1:Informacion/ns1:Resultado"/>
+                        </pfx:RESULTADO>
+                        <pfx:MENSAJE>
+                            <xsl:value-of select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns1:Informacion/ns1:Mensaje"/>
+                        </pfx:MENSAJE>
+                    </pfx:INFORMACION>
+                    <pfx:RECOMENDACION>
+                        <xsl:value-of select="'N/A'"/>
+                    </pfx:RECOMENDACION>
+                    <xsl:for-each select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:ResultSet1/ns5:Record1">
+                        <pfx:POLITICAS>
+                            <pfx:CODIGO>
+                                <xsl:value-of select="ns5:COD_PCA"/>
+                            </pfx:CODIGO>
+                            <pfx:DESCRIPCION>
+                                <xsl:value-of select="ns5:DESCRIPCION"/>
+                            </pfx:DESCRIPCION>
+                            <pfx:VALOR>
+                                <xsl:value-of select="ns5:VAL_PMT"/>
+                            </pfx:VALOR>
+                        </pfx:POLITICAS>
+                    </xsl:for-each>
+                </xsl:when>
+                <!--SOLO BENEFICIARIO NUEVO-->
+                <xsl:otherwise>
+                    <pfx:INFORMACION>
+                        <pfx:CODIGO>
+                            <xsl:value-of select="$Validacion-Beneficiario-Nuevo/root/ns1:Informacion/ns1:Codigo"/>
+                        </pfx:CODIGO>
+                        <pfx:RESULTADO>
+                            <xsl:value-of select="$Validacion-Beneficiario-Nuevo/root/ns1:Informacion/ns1:Resultado"/>
+                        </pfx:RESULTADO>
+                        <pfx:MENSAJE>
+                            <xsl:value-of select="$Validacion-Beneficiario-Nuevo/root/ns1:Informacion/ns1:Mensaje"/>
+                        </pfx:MENSAJE>
+                    </pfx:INFORMACION>
+                    <pfx:RECOMENDACION>
+                        <xsl:value-of select="$Validacion-Beneficiario-Nuevo/root/Recomendacion"/>
+                    </pfx:RECOMENDACION>
+                    <xsl:for-each select="$Validacion-Beneficiario-Nuevo/root/Politicas">
+                        <pfx:POLITICAS>
+                            <pfx:CODIGO>
+                                <xsl:value-of select="codigo"/>
+                            </pfx:CODIGO>
+                            <pfx:DESCRIPCION>
+                                <xsl:value-of select="descripcion"/>
+                            </pfx:DESCRIPCION>
+                            <pfx:VALOR>
+                                <xsl:value-of select="valor"/>
+                            </pfx:VALOR>
+                        </pfx:POLITICAS>
+                    </xsl:for-each>
+                </xsl:otherwise>
+            </xsl:choose>
+        </pfx:OUTPUT>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx:OUTPUT"/>
+    <pd:endX>642</pd:endX>
+    <pd:endY>35</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Process/Main/CL1CO_CONBeneficiarioNuevoACT</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>978</pd:x>
+        <pd:y>35</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+            <fault>localname=ValidationException namespace=http://schemas.tibco.com/bw/plugins/xml/5.0/xmlExceptions</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Consulta Politicas De Ambiente">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>408</pd:x>
+        <pd:y>43</pd:y>
+        <config>
+            <processName>/Process/SubProcess/CL1SPORAC_CONPoliticasDeAmbienteACT.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns5:inputSet>
+                <ns5:IN_COD_CNL_LGC>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:CANAL_LGC"/>
+                </ns5:IN_COD_CNL_LGC>
+                <ns5:IN_COD_FNC>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:COD_FUNCIONALIDAD"/>
+                </ns5:IN_COD_FNC>
+                <ns5:IN_COD_TPO_FNC>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:TIPO_FUNCIONALIDAD"/>
+                </ns5:IN_COD_TPO_FNC>
+                <ns5:IN_TPO_MND>
+                    <xsl:value-of select="'CLP'"/>
+                </ns5:IN_TPO_MND>
+                <ns5:IN_COD_SGM>
+                    <xsl:value-of select="''"/>
+                </ns5:IN_COD_SGM>
+            </ns5:inputSet>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>202</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>true</validateOutput>
+            <term ref="pfx3:DATA"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="concat('&lt;DATA>',$Start/pfx:INPUT/pfx:DATOS_TRANSACCION/pfx:DATA,'&lt;/DATA>')"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validacion Beneficiario Nuevo">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>416</pd:x>
+        <pd:y>167</pd:y>
+        <config>
+            <processName>/Process/SubProcess/ValidacionBeneficiarioNuevo.process</processName>
+        </config>
+        <pd:inputBindings>
+            <Entrada>
+                <CANAL_LGC>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:CANAL_LGC"/>
+                </CANAL_LGC>
+                <USUARIO_ALT>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:USUARIO_ALT"/>
+                </USUARIO_ALT>
+                <COD_FUNCIONALIDAD>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:COD_FUNCIONALIDAD"/>
+                </COD_FUNCIONALIDAD>
+                <TIPO_FUNCIONALIDAD>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:TIPO_FUNCIONALIDAD"/>
+                </TIPO_FUNCIONALIDAD>
+                <CODIGO_MONEDA>
+                    <xsl:value-of select="'CLP'"/>
+                </CODIGO_MONEDA>
+                <ControlBeneficiarioNuevo>
+                    <RUT_CARGO>
+                        <xsl:value-of select="$Parse-XML/DATA/RUT_CARGO"/>
+                    </RUT_CARGO>
+                    <RUT_ABONO>
+                        <xsl:value-of select="$Parse-XML/DATA/RUT_ABONO"/>
+                    </RUT_ABONO>
+                    <CUENTA_ABONO>
+                        <xsl:value-of select="$Parse-XML/DATA/CUENTA_ABONO"/>
+                    </CUENTA_ABONO>
+                    <FECHA_TEF>
+                        <xsl:value-of select="$Parse-XML/DATA/FECHA_TEF"/>
+                    </FECHA_TEF>
+                    <MONTO_TEF>
+                        <xsl:value-of select="$Parse-XML/DATA/MONTO_TEF"/>
+                    </MONTO_TEF>
+                </ControlBeneficiarioNuevo>
+                <ClientePreLife>
+                    <xsl:value-of select="false()"/>
+                </ClientePreLife>
+            </Entrada>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ControlDeErrores">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>806</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <processName>/Process/SubProcess/ControlDeErrores.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <elemento>
+                    <xsl:value-of select="''"/>
+                </elemento>
+                <xsl:copy-of select="$_error/ns3:ErrorReport"/>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ControlDeErrores</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Validacion Beneficiario Nuevo</pd:to>
+        <pd:xpathDescription>Evaluacion</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Consulta Politicas De Ambiente</pd:to>
+        <pd:xpathDescription>Consulta</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>exists($Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:MODO_CONSULTA)</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Consulta Politicas De Ambiente</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ControlDeErrores</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validacion Beneficiario Nuevo</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:label>
+        <pd:name>Label</pd:name>
+        <pd:description>Opcional campos choice de entrada
+MODO_CONSULTA y MODO_EVALUACION
+
+Nuevos campos de salida
+MECANISMO_SEGURIDAD
+POLITICAS.VALOR_FORMATEADO
+
+Expone mismo wsdl pero otro binding
+wsCL1CO_CONBeneficiarioNuevoACT</pd:description>
+        <pd:x>130</pd:x>
+        <pd:y>188</pd:y>
+        <pd:width>252</pd:width>
+        <pd:height>157</pd:height>
+        <pd:fontColor>-16777216</pd:fontColor>
+        <pd:color>-52</pd:color>
+        <pd:type>solid</pd:type>
+        <pd:thickness>0</pd:thickness>
+        <pd:fade>false</pd:fade>
+    </pd:label>
+</pd:ProcessDefinition>

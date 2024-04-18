@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:pfx="http://itg.isban.cl/AppOfficeBanking/Schemas/TCFE.xsd" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:ns1="http://xmlns.tibco.com/encodings/mime" xmlns:ns3="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://itg.isban.cl/CL/TC/1MDTCGG/WSDL/DatosFeriados" xmlns:pfx2="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd">
+    <xsd:import namespace="http://itg.isban.cl/AppOfficeBanking/Schemas/TCFE.xsd" schemaLocation="/Resources/WSDL/wsCL1MDTCFE_CONDatosFeriados.wsdl"/>
+    <xsd:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" schemaLocation="/Resources/Schemas/Informacion.xsd"/>
+    <wsdl:import namespace="http://itg.isban.cl/CL/TC/1MDTCGG/WSDL/DatosFeriados" location="/Resources/WSDL/wsCL1MDTCFE_CONDatosFeriados.wsdl"/>
+    <pd:name>Process/SubProcess/TCFE_CONDatosFeriados.process</pd:name>
+    <pd:description>TCFE - Consulta si una fecha es habil</pd:description>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:INPUT"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>35</pd:startY>
+    <pd:returnBindings>
+        <Salida>
+            <xsl:choose>
+                <xsl:when test="string($Catch/exceptiondata/*)!=''">
+                    <pfx2:Informacion>
+                        <pfx2:Codigo>
+                            <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/INFO/CodigoError"/>
+                        </pfx2:Codigo>
+                        <pfx2:Resultado>
+                            <xsl:value-of select="tib:render-xml($Catch/exceptiondata, true(), false())"/>
+                        </pfx2:Resultado>
+                        <pfx2:Mensaje>
+                            <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/INFO/MsjError"/>
+                        </pfx2:Mensaje>
+                    </pfx2:Informacion>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:copy-of select="$ControlDeErrores/pfx2:Informacion"/>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:copy-of select="$SOAP-Request-Reply/outputMessage/pfx:TIB_TCFE_CONDatosFeriados_Response"/>
+        </Salida>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="Salida">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="pfx2:Informacion"/>
+                    <xsd:element ref="pfx:TIB_TCFE_CONDatosFeriados_Response" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>776</pd:endX>
+    <pd:endY>35</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:partners/>
+    <pd:targetNamespace>http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Process/SubProcess/TCFE_CONDatosFeriados</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>1030</pd:x>
+        <pd:y>35</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+            <fault>localname=HttpClientException namespace=http://schemas.tibco.com/bw/plugins/http/5.0/httpExceptions</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="SOAP Request Reply">
+        <pd:type>com.tibco.plugin.soap.SOAPSendReceiveActivity</pd:type>
+        <pd:resourceType>ae.activities.SOAPSendReceiveUI</pd:resourceType>
+        <pd:x>335</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <timeout>%%WSENDPOINT/INTERNO/TimeOut%%</timeout>
+            <soapAttachmentStyle>SwA</soapAttachmentStyle>
+            <timeoutType>Seconds</timeoutType>
+            <service>pfx3:wsCL1MDTCFE_CONDatosFeriados</service>
+            <servicePort>wsCL1MDTCFE_CONDatosFeriados</servicePort>
+            <operation>getDatosFeriados</operation>
+            <soapAction>/Services/wsCL1MDTCFE_CONDatosFeriados/getDatosFeriados</soapAction>
+            <endpointURL>%%WSENDPOINT/INTERNO/TCFECONDatosFeriados%%</endpointURL>
+            <authScheme>NONE</authScheme>
+            <ns0:ssl xmlns:ns0="http://www.tibco.com/xmlns/aemeta/services/2002">
+                <ns0:strongCipherSuitesOnly>true</ns0:strongCipherSuitesOnly>
+                <ns0:cert isRef="true">%%BW_GLOBAL_TRUSTED_CA_STORE%%</ns0:cert>
+            </ns0:ssl>
+        </config>
+        <pd:inputBindings>
+            <inputMessage>
+                <pfx:INPUT>
+                    <pfx:USUARIO-ALT>
+                        <xsl:value-of select="$Start/pfx:INPUT/pfx:USUARIO-ALT"/>
+                    </pfx:USUARIO-ALT>
+                    <pfx:TERMINAL-ALT>
+                        <xsl:value-of select="$Start/pfx:INPUT/pfx:TERMINAL-ALT"/>
+                    </pfx:TERMINAL-ALT>
+                    <pfx:CANAL-ID>
+                        <xsl:value-of select="$Start/pfx:INPUT/pfx:CANAL-ID"/>
+                    </pfx:CANAL-ID>
+                    <pfx:FILLER>
+                        <xsl:value-of select="$Start/pfx:INPUT/pfx:FILLER"/>
+                    </pfx:FILLER>
+                    <pfx:OPCION>
+                        <xsl:value-of select="$Start/pfx:INPUT/pfx:OPCION"/>
+                    </pfx:OPCION>
+                    <pfx:FECHA>
+                        <xsl:value-of select="$Start/pfx:INPUT/pfx:FECHA"/>
+                    </pfx:FECHA>
+                </pfx:INPUT>
+            </inputMessage>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ControlDeErrores">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>500</pd:x>
+        <pd:y>140</pd:y>
+        <config>
+            <processName>/Process/SubProcess/ControlDeErrores.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <elemento>
+                    <xsl:value-of select="tib:substring-after-last($_globalVariables/ns3:GlobalVariables/WSENDPOINT/INTERNO/TCFECONDatosFeriados, '/')"/>
+                </elemento>
+                <pfx2:Informacion>
+                    <pfx2:Codigo>
+                        <xsl:value-of select="$SOAP-Request-Reply/outputMessage/pfx:TIB_TCFE_CONDatosFeriados_Response/pfx:INFO/pfx:CODERR"/>
+                    </pfx2:Codigo>
+                    <pfx2:Resultado>
+                        <xsl:value-of select="$SOAP-Request-Reply/outputMessage/pfx:TIB_TCFE_CONDatosFeriados_Response/pfx:INFO/pfx:DESERR"/>
+                    </pfx2:Resultado>
+                    <pfx2:Mensaje>
+                        <xsl:value-of select="substring($SOAP-Request-Reply/outputMessage/pfx:TIB_TCFE_CONDatosFeriados_Response/pfx:INFO/pfx:DESERR, 12)"/>
+                    </pfx2:Mensaje>
+                </pfx2:Informacion>
+                <xsl:copy-of select="$_error/ns:ErrorReport"/>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>501</pd:x>
+        <pd:y>35</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Log entrada">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>173</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <processName>/Process/SubProcess/EscribeEnElLog.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <Proceso>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns:ProcessContext/ProcessId)"/>
+                </Proceso>
+                <Mensaje>
+                    <titulo>
+                        <xsl:value-of select="'Endpoint'"/>
+                    </titulo>
+                    <mensaje>
+                        <xsl:value-of select="$_globalVariables/ns3:GlobalVariables/WSENDPOINT/INTERNO/TCFECONDatosFeriados"/>
+                    </mensaje>
+                </Mensaje>
+                <Mensaje>
+                    <titulo>
+                        <xsl:value-of select="'Datos de entrada al BE'"/>
+                    </titulo>
+                    <xml>
+                        <xsl:copy-of select="$Start/*"/>
+                    </xml>
+                </Mensaje>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Log Informacion">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>627</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <processName>/Process/SubProcess/EscribeEnElLog.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <Proceso>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns:ProcessContext/ProcessId)"/>
+                </Proceso>
+                <Mensaje>
+                    <titulo>
+                        <xsl:value-of select="'Respuesta del BE'"/>
+                    </titulo>
+                    <xml>
+                        <xsl:copy-of select="$SOAP-Request-Reply/outputMessage/pfx:TIB_TCFE_CONDatosFeriados_Response"/>
+                    </xml>
+                </Mensaje>
+                <Mensaje>
+                    <titulo>
+                        <xsl:value-of select="'Resultado de BE'"/>
+                    </titulo>
+                    <xml>
+                        <xsl:copy-of select="$ControlDeErrores/pfx2:Informacion"/>
+                    </xml>
+                </Mensaje>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ControlDeErrores Catch">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>895</pd:x>
+        <pd:y>43</pd:y>
+        <config>
+            <processName>/Process/SubProcess/ControlDeErrores.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <elemento>
+                    <xsl:value-of select="tib:substring-after-last($_globalVariables/ns3:GlobalVariables/WSENDPOINT/INTERNO/TCFECONDatosFeriados, '/')"/>
+                </elemento>
+                <pfx2:Informacion>
+                    <pfx2:Codigo>
+                        <xsl:value-of select="$SOAP-Request-Reply/outputMessage/pfx:TIB_TCFE_CONDatosFeriados_Response/pfx:INFO/pfx:CODERR"/>
+                    </pfx2:Codigo>
+                    <pfx2:Resultado>
+                        <xsl:value-of select="$SOAP-Request-Reply/outputMessage/pfx:TIB_TCFE_CONDatosFeriados_Response/pfx:INFO/pfx:DESERR"/>
+                    </pfx2:Resultado>
+                    <pfx2:Mensaje>
+                        <xsl:value-of select="substring($SOAP-Request-Reply/outputMessage/pfx:TIB_TCFE_CONDatosFeriados_Response/pfx:INFO/pfx:DESERR, 12)"/>
+                    </pfx2:Mensaje>
+                </pfx2:Informacion>
+                <xsl:copy-of select="$_error/ns:ErrorReport"/>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>SOAP Request Reply</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ControlDeErrores Catch</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SOAP Request Reply</pd:from>
+        <pd:to>ControlDeErrores</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ControlDeErrores</pd:from>
+        <pd:to>Log Informacion</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>ControlDeErrores</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Log entrada</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log entrada</pd:from>
+        <pd:to>SOAP Request Reply</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log Informacion</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ControlDeErrores Catch</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

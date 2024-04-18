@@ -1,0 +1,1044 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns1="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns4="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/SPSQL_CONEstadoBeneficiario.xsd" xmlns:ns="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:ns3="http://www.tibco.com/pe/EngineTypes" xmlns:ns0="http://itg.isban.cl/AppOfficeBanking/Schemas/TCFE.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx3="http://www.tibco.com/ns/no_namespace_schema_location/Resources/Schemas/CDATA_BeneficiarioNuevo.xsd" xmlns:ns5="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/SPORAC_CONPoliticasDeAmbiente.xsd" xmlns:pfx="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/BeneficiarioNuevo.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/BeneficiarioNuevo.xsd" schemaLocation="/Resources/Schemas/BeneficiarioNuevo.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Resources/Schemas/CDATA_BeneficiarioNuevo.xsd" schemaLocation="/Resources/Schemas/CDATA_BeneficiarioNuevo.xsd"/>
+    <xsd:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" schemaLocation="/Resources/Schemas/Informacion.xsd"/>
+    <pd:name>Process/Main/CL1CO_CONBeneficiarioNuevo.process</pd:name>
+    <pd:description>1ra versión</pd:description>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:INPUT"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>35</pd:startY>
+    <pd:returnBindings>
+        <xsl:choose>
+            <xsl:when test="string($Catch/exceptiondata/*)!=''">
+                <pfx:OUTPUT>
+                    <pfx:INFORMACION>
+                        <pfx:CODIGO>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/INFO/CodigoError"/>
+                        </pfx:CODIGO>
+                        <pfx:RESULTADO>
+                            <xsl:value-of select="concat('Job-',$_processContext/ns3:ProcessContext/ProcessId,';',tib:render-xml($Catch/exceptiondata, true(), false()))"/>
+                        </pfx:RESULTADO>
+                        <pfx:MENSAJE>
+                            <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/INFO/MsjError"/>
+                        </pfx:MENSAJE>
+                    </pfx:INFORMACION>
+                    <pfx:RECOMENDACION>
+                        <xsl:value-of select="'ERROR'"/>
+                    </pfx:RECOMENDACION>
+                    <xsl:for-each select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:ResultSet1/ns5:Record1">
+                        <pfx:POLITICAS>
+                            <pfx:CODIGO>
+                                <xsl:value-of select="ns5:COD_PCA"/>
+                            </pfx:CODIGO>
+                            <pfx:DESCRIPCION>
+                                <xsl:value-of select="''"/>
+                            </pfx:DESCRIPCION>
+                            <pfx:VALOR>
+                                <xsl:value-of select="ns5:VAL_PMT"/>
+                            </pfx:VALOR>
+                        </pfx:POLITICAS>
+                    </xsl:for-each>
+                </pfx:OUTPUT>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy-of select="$Map-OUTPUT/pfx:OUTPUT"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx:OUTPUT"/>
+    <pd:endX>674</pd:endX>
+    <pd:endY>35</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <Info_1raTEF>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="FechaSP_fch_hra_lnz_trn" type="xsd:string"/>
+                        <xsd:element name="DiaHabil" type="xsd:boolean"/>
+                        <xsd:element name="HoraSigTEF" type="xsd:int"/>
+                        <xsd:element name="Dia_aaaammdd" type="xsd:date"/>
+                        <xsd:element name="Dia_ddmmaaaa" type="xsd:string"/>
+                        <xsd:element name="Hora_hhmmss" type="xsd:time"/>
+                        <xsd:element name="DiaHabil_y_2daTEFDesdeMismoDia" type="xsd:boolean"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Info_1raTEF>
+        <Info_2daTEF>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="Fecha_dia_hora" type="xsd:string"/>
+                        <xsd:element name="DiaHabil" type="xsd:boolean"/>
+                        <xsd:element name="Dia_aaaammdd" type="xsd:date"/>
+                        <xsd:element name="Hora_hhmmss" type="xsd:time"/>
+                        <xsd:element name="FechaMenorA1raTEF" type="xsd:boolean"/>
+                        <xsd:element name="FechaIgualA1raTEF" type="xsd:boolean"/>
+                        <xsd:element name="FechaMayorA1raTEF" type="xsd:boolean"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Info_2daTEF>
+        <Info_SigDiaHabil>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="Fecha" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Info_SigDiaHabil>
+        <Info_PoliticaFecha>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="PoliticaEnHoras" type="xsd:int"/>
+                        <xsd:element name="IteracionDiaHabil" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Info_PoliticaFecha>
+    </pd:processVariables>
+    <pd:targetNamespace>http://itg.Santander.cl/AppEvaluadorRiesgo_Persona/Process/Main/CL1CO_CONBeneficiarioNuevo</pd:targetNamespace>
+    <pd:group name="Group">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>857</pd:x>
+        <pd:y>102</pd:y>
+        <pd:width>386</pd:width>
+        <pd:height>371</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>repeat</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>indice</pd:indexSlot>
+            <pd:outSlot>ConsultaFechaHabil</pd:outSlot>
+            <pd:activityOutputName>Map Dia Habil</pd:activityOutputName>
+            <pd:repeatCondition>number($indice) &gt; $Info_PoliticaFecha/root/IteracionDiaHabil or $Consulta-Siguiente-Dia-Habil/Salida/ns1:Informacion/ns1:Codigo=$_globalVariables/ns2:GlobalVariables/INFO/CodigoError</pd:repeatCondition>
+            <pd:accumulateOutput>true</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Consulta Siguiente Dia Habil</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>otherwise</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Null</pd:to>
+            <pd:xpathDescription>fin iteracion</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>number($indice) &gt; $Info_PoliticaFecha/root/IteracionDiaHabil</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Null</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Map Dia Habil</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Sig Dia Habil</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Consulta Siguiente Dia Habil</pd:from>
+            <pd:to>Log Consulta Fecha Habil</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Log Consulta Fecha Habil</pd:from>
+            <pd:to>Sig Dia Habil</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Consulta Siguiente Dia Habil</pd:from>
+            <pd:to>Map Dia Habil</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Consulta Siguiente Dia Habil">
+            <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+            <pd:resourceType>ae.process.subprocess</pd:resourceType>
+            <pd:x>936</pd:x>
+            <pd:y>171</pd:y>
+            <config>
+                <processName>/Process/SubProcess/TCFE_CONDatosFeriados.process</processName>
+            </config>
+            <pd:inputBindings>
+                <ns0:INPUT>
+                    <ns0:USUARIO-ALT>
+                        <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:USUARIO_ALT"/>
+                    </ns0:USUARIO-ALT>
+                    <ns0:TERMINAL-ALT>
+                        <xsl:value-of select="''"/>
+                    </ns0:TERMINAL-ALT>
+                    <ns0:CANAL-ID>
+                        <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:CANAL_LGC"/>
+                    </ns0:CANAL-ID>
+                    <ns0:FILLER>
+                        <xsl:value-of select="''"/>
+                    </ns0:FILLER>
+                    <ns0:OPCION>
+                        <xsl:value-of select="2"/>
+                    </ns0:OPCION>
+                    <ns0:FECHA>
+                        <xsl:value-of select="$Info_SigDiaHabil/root/Fecha"/>
+                    </ns0:FECHA>
+                </ns0:INPUT>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Log Consulta Fecha Habil">
+            <pd:type>com.tibco.pe.core.WriteToLogActivity</pd:type>
+            <pd:resourceType>ae.activities.log</pd:resourceType>
+            <pd:x>1076</pd:x>
+            <pd:y>168</pd:y>
+            <config>
+                <role>User</role>
+            </config>
+            <pd:inputBindings>
+                <ns:ActivityInput>
+                    <message>
+                        <xsl:value-of select="concat('Indice:',$indice,' Fecha a consultar: ', $Info_SigDiaHabil/root/Fecha,' Siguiente fecha habil: ',$Consulta-Siguiente-Dia-Habil/Salida/ns0:TIB_TCFE_CONDatosFeriados_Response/ns0:OUTPUT/ns0:ESCALARES2/ns0:FECHABS)"/>
+                    </message>
+                </ns:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Null">
+            <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+            <pd:resourceType>ae.activities.null</pd:resourceType>
+            <pd:x>987</pd:x>
+            <pd:y>415</pd:y>
+            <config/>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Sig Dia Habil">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>1194</pd:x>
+            <pd:y>216</pd:y>
+            <config>
+                <variableName>Info_SigDiaHabil</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <Fecha>
+                        <xsl:value-of select="$Consulta-Siguiente-Dia-Habil/Salida/ns0:TIB_TCFE_CONDatosFeriados_Response/ns0:OUTPUT/ns0:ESCALARES2/ns0:FECHABS"/>
+                    </Fecha>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Map Dia Habil">
+            <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+            <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+            <pd:x>1032</pd:x>
+            <pd:y>297</pd:y>
+            <config>
+                <element>
+                    <xsd:element name="root">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="Fecha" type="xsd:string"/>
+                                <xsd:element name="Habil" type="xsd:string"/>
+                                <xsd:element name="Horas" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </element>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <Fecha>
+                        <xsl:value-of select="tib:create-date(substring($Consulta-Siguiente-Dia-Habil/Salida/ns0:TIB_TCFE_CONDatosFeriados_Response/ns0:OUTPUT/ns0:ESCALARES2/ns0:FECHA, 7, 4),&#xA;substring($Consulta-Siguiente-Dia-Habil/Salida/ns0:TIB_TCFE_CONDatosFeriados_Response/ns0:OUTPUT/ns0:ESCALARES2/ns0:FECHA, 4, 2),&#xA;substring($Consulta-Siguiente-Dia-Habil/Salida/ns0:TIB_TCFE_CONDatosFeriados_Response/ns0:OUTPUT/ns0:ESCALARES2/ns0:FECHA, 1, 2))"/>
+                    </Fecha>
+                    <Habil>
+                        <xsl:value-of select="$Consulta-Siguiente-Dia-Habil/Salida/ns0:TIB_TCFE_CONDatosFeriados_Response/ns0:OUTPUT/ns0:ESCALARES2/ns0:INDDIA='VALIDA'"/>
+                    </Habil>
+                    <Horas>
+                        <xsl:value-of select="if ($Consulta-Siguiente-Dia-Habil/Salida/ns0:TIB_TCFE_CONDatosFeriados_Response/ns0:OUTPUT/ns0:ESCALARES2/ns0:INDDIA='VALIDA') then 24 else 0"/>
+                    </Horas>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>934</pd:x>
+        <pd:y>35</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+            <fault>localname=ValidationException namespace=http://schemas.tibco.com/bw/plugins/xml/5.0/xmlExceptions</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Consulta Estado Beneficiario">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>52</pd:x>
+        <pd:y>408</pd:y>
+        <config>
+            <processName>/Process/SubProcess/CL1SPSQL_CONEstadoBeneficiario.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns4:inputSet>
+                <ns4:nro_doc_cgo>
+                    <xsl:value-of select="$Parse-XML/DATA/RUT_CARGO"/>
+                </ns4:nro_doc_cgo>
+                <ns4:nro_cta_cgo_usr_innet>
+                    <xsl:value-of select="''"/>
+                </ns4:nro_cta_cgo_usr_innet>
+                <ns4:nro_doc_abn>
+                    <xsl:value-of select="$Parse-XML/DATA/RUT_ABONO"/>
+                </ns4:nro_doc_abn>
+                <ns4:nro_cta_abn>
+                    <xsl:value-of select="''"/>
+                </ns4:nro_cta_abn>
+                <ns4:mnt_tef>
+                    <xsl:value-of select="0"/>
+                </ns4:mnt_tef>
+            </ns4:inputSet>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Consulta Politicas De Ambiente">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>57</pd:x>
+        <pd:y>132</pd:y>
+        <config>
+            <processName>/Process/SubProcess/CL1SPORAC_CONPoliticasDeAmbiente.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns5:inputSet>
+                <ns5:IN_COD_CNL_LGC>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:CANAL_LGC"/>
+                </ns5:IN_COD_CNL_LGC>
+                <ns5:IN_COD_FNC>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:COD_FUNCIONALIDAD"/>
+                </ns5:IN_COD_FNC>
+                <ns5:IN_COD_TPO_FNC>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:TIPO_FUNCIONALIDAD"/>
+                </ns5:IN_COD_TPO_FNC>
+                <ns5:IN_TPO_MND>
+                    <xsl:value-of select="'CLP'"/>
+                </ns5:IN_TPO_MND>
+                <ns5:IN_COD_SGM>
+                    <xsl:value-of select="''"/>
+                </ns5:IN_COD_SGM>
+            </ns5:inputSet>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Consulta si 1ra TEF se hizo en dia habil">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>485</pd:x>
+        <pd:y>414</pd:y>
+        <config>
+            <processName>/Process/SubProcess/TCFE_CONDatosFeriados.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns0:INPUT>
+                <ns0:USUARIO-ALT>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:USUARIO_ALT"/>
+                </ns0:USUARIO-ALT>
+                <ns0:TERMINAL-ALT>
+                    <xsl:value-of select="''"/>
+                </ns0:TERMINAL-ALT>
+                <ns0:CANAL-ID>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:CANAL_LGC"/>
+                </ns0:CANAL-ID>
+                <ns0:FILLER>
+                    <xsl:value-of select="''"/>
+                </ns0:FILLER>
+                <ns0:OPCION>
+                    <xsl:value-of select="1"/>
+                </ns0:OPCION>
+                <ns0:FECHA>
+                    <xsl:value-of select="$Info_1raTEF/root/Dia_ddmmaaaa"/>
+                </ns0:FECHA>
+            </ns0:INPUT>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Informacion PrimeraTEF fecha">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>344</pd:x>
+        <pd:y>408</pd:y>
+        <config>
+            <variableName>Info_1raTEF</variableName>
+        </config>
+        <pd:inputBindings>
+            <xsl:variable name="fch_hra_lnz_trn" select="$Consulta-Estado-Beneficiario/ns4:outputSet/ns4:Resultsets/ns4:ResultSet1/ns4:Record1/ns4:fch_hra_lnz_trn"/>
+            <root>
+                <FechaSP_fch_hra_lnz_trn>
+                    <xsl:value-of select="$fch_hra_lnz_trn"/>
+                </FechaSP_fch_hra_lnz_trn>
+                <DiaHabil>
+                    <xsl:value-of select="false()"/>
+                </DiaHabil>
+                <HoraSigTEF>
+                    <xsl:value-of select="number(tib:get-hours-from-dateTime($fch_hra_lnz_trn))+$Info_PoliticaFecha/root/PoliticaEnHoras"/>
+                </HoraSigTEF>
+                <Dia_aaaammdd>
+                    <xsl:value-of select="tib:create-date(tib:get-year-from-dateTime($fch_hra_lnz_trn),tib:get-month-from-dateTime($fch_hra_lnz_trn),tib:get-day-from-dateTime($fch_hra_lnz_trn))"/>
+                </Dia_aaaammdd>
+                <Dia_ddmmaaaa>
+                    <xsl:value-of select="tib:format-date('dd-MM-yyyy', tib:create-date(tib:get-year-from-dateTime($fch_hra_lnz_trn),tib:get-month-from-dateTime($fch_hra_lnz_trn),tib:get-day-from-dateTime($fch_hra_lnz_trn)))"/>
+                </Dia_ddmmaaaa>
+                <Hora_hhmmss>
+                    <xsl:value-of select="tib:create-time(tib:get-hours-from-dateTime($fch_hra_lnz_trn), tib:get-minutes-from-dateTime($fch_hra_lnz_trn), tib:get-seconds-from-dateTime($fch_hra_lnz_trn))"/>
+                </Hora_hhmmss>
+                <DiaHabil_y_2daTEFDesdeMismoDia>
+                    <xsl:value-of select="false()"/>
+                </DiaHabil_y_2daTEFDesdeMismoDia>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Informacion Segunda TEF">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>347</pd:x>
+        <pd:y>542</pd:y>
+        <config>
+            <variableName>Info_2daTEF</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:variable name="varFecha2daTEF" select="$Parse-XML/DATA/FECHA_TEF"/>
+                <Fecha_dia_hora>
+                    <xsl:value-of select="$varFecha2daTEF"/>
+                </Fecha_dia_hora>
+                <DiaHabil>
+                    <xsl:value-of select="false()"/>
+                </DiaHabil>
+                <Dia_aaaammdd>
+                    <xsl:value-of select="tib:create-date(tib:get-year-from-dateTime($varFecha2daTEF),tib:get-month-from-dateTime($varFecha2daTEF),tib:get-day-from-dateTime($varFecha2daTEF))"/>
+                </Dia_aaaammdd>
+                <Hora_hhmmss>
+                    <xsl:value-of select="tib:create-time(tib:get-hours-from-dateTime($varFecha2daTEF), tib:get-minutes-from-dateTime($varFecha2daTEF), tib:get-seconds-from-dateTime($varFecha2daTEF))"/>
+                </Hora_hhmmss>
+                <xsl:variable name="varCompareDateTime" select="tib:compare-dateTime($varFecha2daTEF, $Info_1raTEF/root/FechaSP_fch_hra_lnz_trn)"/>
+                <FechaMenorA1raTEF>
+                    <xsl:value-of select="$varCompareDateTime = -1"/>
+                </FechaMenorA1raTEF>
+                <FechaIgualA1raTEF>
+                    <xsl:value-of select="$varCompareDateTime = 0"/>
+                </FechaIgualA1raTEF>
+                <FechaMayorA1raTEF>
+                    <xsl:value-of select="$varCompareDateTime = 1"/>
+                </FechaMayorA1raTEF>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Log 2da TEF Desde">
+        <pd:type>com.tibco.pe.core.WriteToLogActivity</pd:type>
+        <pd:resourceType>ae.activities.log</pd:resourceType>
+        <pd:x>550</pd:x>
+        <pd:y>153</pd:y>
+        <config>
+            <role>User</role>
+            <suppressHeader>true</suppressHeader>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <message>
+                    <xsl:value-of select="tib:render-xml($Map-2da-TEF-Desde/root, true(), false())"/>
+                </message>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Log Catch">
+        <pd:type>com.tibco.pe.core.WriteToLogActivity</pd:type>
+        <pd:resourceType>ae.activities.log</pd:resourceType>
+        <pd:x>805</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <role>User</role>
+            <suppressHeader>true</suppressHeader>
+        </config>
+        <pd:inputBindings>
+            <ns:ActivityInput>
+                <message>
+                    <xsl:value-of select="tib:render-xml($Catch/exceptiondata/*, true(), false())"/>
+                </message>
+            </ns:ActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map 2da TEF Desde">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>718</pd:x>
+        <pd:y>172</pd:y>
+        <config>
+            <element>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="variables">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="varTimeZone" type="xsd:string"/>
+                                        <xsd:element name="varFecha2daTEF_aaaammdd" type="xsd:string"/>
+                                        <xsd:element name="varHora2daTEF" type="xsd:string"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                            <xsd:element name="FechaDesde_dia_mes" type="xsd:dateTime"/>
+                            <xsd:element name="Dia_aaaammdd" type="xsd:date"/>
+                            <xsd:element name="dd_de_mmm_a_las_hh_mm" type="xsd:string"/>
+                            <xsd:element name="FechaDesde_MenorA2daTEF" type="xsd:boolean"/>
+                            <xsd:element name="FechaDesde_IgualA2daTEF" type="xsd:boolean"/>
+                            <xsd:element name="FechaDesde_MayorA2daTEF" type="xsd:boolean"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:variable name="varTimeZone" select="tib:get-timezone-from-dateTime($Info_1raTEF/root/FechaSP_fch_hra_lnz_trn)"/>
+                <xsl:variable name="varFecha2daTEF_aaaammdd" select="if ($Info_1raTEF/root/DiaHabil='true' and $Info_1raTEF/root/HoraSigTEF&lt;24) &#xA;then concat(substring($Info_1raTEF/root/Dia_ddmmaaaa, 7, 4), substring($Info_1raTEF/root/Dia_ddmmaaaa, 4, 2), substring($Info_1raTEF/root/Dia_ddmmaaaa, 1, 2))&#xA;else concat(substring($Info_SigDiaHabil/root/Fecha, 7, 4), substring($Info_SigDiaHabil/root/Fecha, 4, 2), substring($Info_SigDiaHabil/root/Fecha, 1, 2))"/>
+                <xsl:variable name="varHora2daTEF" select="if ($Info_PoliticaFecha/root/PoliticaEnHoras>23) then tib:get-hours-from-dateTime($Info_1raTEF/root/FechaSP_fch_hra_lnz_trn)&#xA;else if ($Info_1raTEF/root/HoraSigTEF>23) then number($Info_1raTEF/root/HoraSigTEF)-24&#xA;else $Info_1raTEF/root/HoraSigTEF"/>
+                <variables>
+                    <varTimeZone>
+                        <xsl:value-of select="$varTimeZone"/>
+                    </varTimeZone>
+                    <varFecha2daTEF_aaaammdd>
+                        <xsl:value-of select="$varFecha2daTEF_aaaammdd"/>
+                    </varFecha2daTEF_aaaammdd>
+                    <varHora2daTEF>
+                        <xsl:value-of select="$varHora2daTEF"/>
+                    </varHora2daTEF>
+                </variables>
+                <xsl:variable name="var2TEF_Desde" select="if ($Info_1raTEF/root/DiaHabil='true') then tib:create-dateTime-timezone(&#xA;&#x9;substring($varFecha2daTEF_aaaammdd, 1, 4), substring($varFecha2daTEF_aaaammdd, 5, 2), substring($varFecha2daTEF_aaaammdd, 7, 2), $varHora2daTEF,&#xA;&#x9;tib:get-minutes-from-dateTime($Info_1raTEF/root/FechaSP_fch_hra_lnz_trn),&#xA;&#x9;tib:get-seconds-from-dateTime($Info_1raTEF/root/FechaSP_fch_hra_lnz_trn),&#xA;&#x9;substring-before($varTimeZone, ':'),substring-after($varTimeZone, ':'))&#xA;else tib:create-dateTime-timezone(&#xA;&#x9;substring($varFecha2daTEF_aaaammdd, 1, 4), substring($varFecha2daTEF_aaaammdd, 5, 2), substring($varFecha2daTEF_aaaammdd, 7, 2), &#xA;&#x9; 0, 0, 1,&#xA;&#x9;substring-before($varTimeZone, ':'),substring-after($varTimeZone, ':'))"/>
+                <xsl:variable name="varCompareDataTime" select="tib:compare-dateTime($var2TEF_Desde, $Info_2daTEF/root/Fecha_dia_hora)"/>
+                <FechaDesde_dia_mes>
+                    <xsl:value-of select="$var2TEF_Desde"/>
+                </FechaDesde_dia_mes>
+                <Dia_aaaammdd>
+                    <xsl:value-of select="tib:create-date(tib:get-year-from-dateTime($var2TEF_Desde),tib:get-month-from-dateTime($var2TEF_Desde),tib:get-day-from-dateTime($var2TEF_Desde))"/>
+                </Dia_aaaammdd>
+                <dd_de_mmm_a_las_hh_mm>
+                    <xsl:value-of select="concat(tib:format-dateTime('dd', $var2TEF_Desde),' de ',&#xA;if (tib:get-month-from-dateTime($var2TEF_Desde)=1) then 'enero'&#xA;else if (tib:get-month-from-dateTime($var2TEF_Desde)=2) then 'febrero'&#xA;else if (tib:get-month-from-dateTime($var2TEF_Desde)=3) then 'marzo'&#xA;else if (tib:get-month-from-dateTime($var2TEF_Desde)=4) then 'abril'&#xA;else if (tib:get-month-from-dateTime($var2TEF_Desde)=5) then 'mayo'&#xA;else if (tib:get-month-from-dateTime($var2TEF_Desde)=6) then 'junio'&#xA;else if (tib:get-month-from-dateTime($var2TEF_Desde)=7) then 'julio'&#xA;else if (tib:get-month-from-dateTime($var2TEF_Desde)=8) then 'agosto'&#xA;else if (tib:get-month-from-dateTime($var2TEF_Desde)=9) then 'septiembre'&#xA;else if (tib:get-month-from-dateTime($var2TEF_Desde)=10) then 'octubre'&#xA;else if (tib:get-month-from-dateTime($var2TEF_Desde)=11) then 'noviembre'&#xA;else if (tib:get-month-from-dateTime($var2TEF_Desde)=12) then 'diciembre' else ''&#xA;,' a las ',tib:format-dateTime('HH:mm', $var2TEF_Desde))"/>
+                </dd_de_mmm_a_las_hh_mm>
+                <FechaDesde_MenorA2daTEF>
+                    <xsl:value-of select="$varCompareDataTime = -1"/>
+                </FechaDesde_MenorA2daTEF>
+                <FechaDesde_IgualA2daTEF>
+                    <xsl:value-of select="$varCompareDataTime = 0"/>
+                </FechaDesde_IgualA2daTEF>
+                <FechaDesde_MayorA2daTEF>
+                    <xsl:value-of select="$varCompareDataTime = 1"/>
+                </FechaDesde_MayorA2daTEF>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map OUTPUT">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>315</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <element ref="pfx:OUTPUT"/>
+        </config>
+        <pd:inputBindings>
+            <xsl:variable name="varResultado" select="''{--concat('Job-',$_processContext/ns3:ProcessContext/ProcessId,';')--}"/>
+            <pfx:OUTPUT>
+                <xsl:choose>
+                    <xsl:when test="exists($Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:MODO_EVALUACION) and $Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:OUT_FLG_EST_FNC='SI'">
+                        <xsl:choose>
+                            <xsl:when test="number($Consulta-Estado-Beneficiario/ns4:outputSet/ns4:Resultsets/ns4:ResultSet1/ns4:Record1/ns4:ind_tef)=1 {-- PRIMERA TRANFERENCIA --}">
+                                <xsl:variable name="varPoliticaMonto" select="number($Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:ResultSet1/ns5:Record1[ns5:COD_PCA=111]/ns5:VAL_PMT)"/>
+                                <xsl:variable name="varLargoPoliticaMonto" select="string-length(abs($varPoliticaMonto))"/>
+                                <xsl:variable name="varPoliticaMontoFormateado" select="if ($varLargoPoliticaMonto>6) then concat(substring($varPoliticaMonto,1,($varLargoPoliticaMonto - 6)),'.',substring(tib:right($varPoliticaMonto,6),1,3),'.',tib:right($varPoliticaMonto,3))&#xA;else if ($varLargoPoliticaMonto>3) then concat(substring($varPoliticaMonto,1,($varLargoPoliticaMonto - 3)),'.',tib:right($varPoliticaMonto,3))&#xA;else $varPoliticaMonto"/>
+                                <xsl:variable name="varDifMonto" select="number($Parse-XML/DATA/MONTO_TEF)-number($varPoliticaMonto)"/>
+                                <xsl:variable name="varLargoDifMonto" select="string-length(abs($varDifMonto))"/>
+                                <xsl:variable name="varDifMontoFormateado" select="if ($varLargoDifMonto>6) then concat(substring($varDifMonto,1,($varLargoDifMonto - 6)),'.',substring(tib:right($varDifMonto,6),1,3),'.',tib:right($varDifMonto,3))&#xA;else if ($varLargoDifMonto>3) then concat(substring($varDifMonto,1,($varLargoDifMonto - 3)),'.',tib:right($varDifMonto,3))&#xA;else $varDifMonto"/>
+                                <xsl:variable name="varHorasPolitica" select="number($Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:ResultSet1/ns5:Record1[ns5:COD_PCA=222]/ns5:VAL_PMT)"/>
+                                <pfx:INFORMACION>
+                                    <pfx:CODIGO>
+                                        <xsl:value-of select="$Consulta-Estado-Beneficiario/ns4:outputSet/ns1:Informacion/ns1:Codigo"/>
+                                    </pfx:CODIGO>
+                                    <pfx:RESULTADO>
+                                        <xsl:value-of select="concat($varResultado,$Consulta-Estado-Beneficiario/ns4:outputSet/ns1:Informacion/ns1:Resultado,'; Primera transferencia')"/>
+                                    </pfx:RESULTADO>
+                                    <pfx:MENSAJE>
+                                        <xsl:value-of select="if ($varDifMonto>0) then concat('Esta transferencia excede en $',$varDifMontoFormateado,&#xA;'. Podrás volver a transferir a este nuevo destinatario dentro de ',$varHorasPolitica,&#xA;' horas hábiles, con el monto máximo diario establecido para todas las transferencias.')&#xA;else concat('Por tu seguridad te informamos que a partir del ',$_globalVariables/ns2:GlobalVariables/FechaLiberacionPoliticas,', la primera transferencia a nuevos destinatarios no podrá exceder los $',&#xA;$varPoliticaMontoFormateado,'. Podrás volver a transferir a este nuevo destinatario dentro de ',$varHorasPolitica,&#xA;' horas hábiles, con el monto máximo diario establecido para todas las transferencias.')"/>
+                                    </pfx:MENSAJE>
+                                </pfx:INFORMACION>
+                                <pfx:RECOMENDACION>
+                                    <xsl:value-of select="if ($varDifMonto>0) then 'Decline' else 'Allow'"/>
+                                </pfx:RECOMENDACION>
+                                <xsl:for-each select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:ResultSet1/ns5:Record1[ns5:COD_PCA=111]">
+                                    <pfx:POLITICAS>
+                                        <pfx:CODIGO>
+                                            <xsl:value-of select="ns5:COD_PCA"/>
+                                        </pfx:CODIGO>
+                                        <pfx:DESCRIPCION>
+                                            <xsl:value-of select="number(ns5:VAL_PMT)-number($Parse-XML/DATA/MONTO_TEF)"/>
+                                        </pfx:DESCRIPCION>
+                                        <pfx:VALOR>
+                                            <xsl:value-of select="ns5:VAL_PMT"/>
+                                        </pfx:VALOR>
+                                    </pfx:POLITICAS>
+                                </xsl:for-each>
+                            </xsl:when>
+                            <xsl:when test="number($Consulta-Estado-Beneficiario/ns4:outputSet/ns4:Resultsets/ns4:ResultSet1/ns4:Record1/ns4:ind_tef)=2 {-- SEGUNDA TRANSFERENCIA --}">
+                                <xsl:choose>
+                                    <!--POLITICA = 0-->
+                                    <xsl:when test="$Info_PoliticaFecha/root/PoliticaEnHoras = 0">
+                                        <pfx:INFORMACION>
+                                            <pfx:CODIGO>
+                                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/INFO/CodigoOk"/>
+                                            </pfx:CODIGO>
+                                            <pfx:RESULTADO>
+                                                <xsl:value-of select="concat($varResultado,$Consulta-si-1ra-TEF-se-hizo-en-dia-habil/Salida/ns1:Informacion/ns1:Resultado,'; Segunda transferencia',&#xA;' - Fecha 1ra TEF:',$Consulta-Estado-Beneficiario/ns4:outputSet/ns4:Resultsets/ns4:ResultSet1/ns4:Record1/ns4:fch_hra_lnz_trn,&#xA;' - Politica en 0')"/>
+                                            </pfx:RESULTADO>
+                                            <pfx:MENSAJE>
+                                                <xsl:value-of select="'Politica de horas en 0'"/>
+                                            </pfx:MENSAJE>
+                                        </pfx:INFORMACION>
+                                        <pfx:RECOMENDACION>
+                                            <xsl:value-of select="'Allow'"/>
+                                        </pfx:RECOMENDACION>
+                                    </xsl:when>
+                                    <!--1raTEF >= 2da TEF-->
+                                    <xsl:when test="tib:compare-dateTime($Consulta-Estado-Beneficiario/ns4:outputSet/ns4:Resultsets/ns4:ResultSet1/ns4:Record1/ns4:fch_hra_lnz_trn, $Parse-XML/DATA/FECHA_TEF) > -1">
+                                        <pfx:INFORMACION>
+                                            <pfx:CODIGO>
+                                                <xsl:value-of select="$_globalVariables/ns2:GlobalVariables/INFO/CodigoError"/>
+                                            </pfx:CODIGO>
+                                            <pfx:RESULTADO>
+                                                <xsl:value-of select="concat($varResultado,$Consulta-si-1ra-TEF-se-hizo-en-dia-habil/Salida/ns1:Informacion/ns1:Resultado,'; Segunda transferencia',&#xA;' - Fecha 1ra TEF:',$Consulta-Estado-Beneficiario/ns4:outputSet/ns4:Resultsets/ns4:ResultSet1/ns4:Record1/ns4:fch_hra_lnz_trn,&#xA;' - 2da TEF &lt;= 1ra TEF')"/>
+                                            </pfx:RESULTADO>
+                                            <pfx:MENSAJE>
+                                                <xsl:value-of select="concat('Podrás volver a transferir a este destinatario dentro de ',$Info_PoliticaFecha/root/PoliticaEnHoras,' horas hábiles.')"/>
+                                            </pfx:MENSAJE>
+                                        </pfx:INFORMACION>
+                                        <pfx:RECOMENDACION>
+                                            <xsl:value-of select="'Decline'"/>
+                                        </pfx:RECOMENDACION>
+                                    </xsl:when>
+                                    <xsl:when test="not(exists($Consulta-si-1ra-TEF-se-hizo-en-dia-habil/Salida/ns0:TIB_TCFE_CONDatosFeriados_Response/ns0:OUTPUT/ns0:ESCALARES1/ns0:GLSINDD))">
+                                        <pfx:INFORMACION>
+                                            <pfx:CODIGO>
+                                                <xsl:value-of select="$Consulta-si-1ra-TEF-se-hizo-en-dia-habil/Salida/ns1:Informacion/ns1:Codigo"/>
+                                            </pfx:CODIGO>
+                                            <pfx:RESULTADO>
+                                                <xsl:value-of select="concat($varResultado,$Consulta-si-1ra-TEF-se-hizo-en-dia-habil/Salida/ns1:Informacion/ns1:Resultado,'; Segunda transferencia')"/>
+                                            </pfx:RESULTADO>
+                                            <pfx:MENSAJE>
+                                                <xsl:value-of select="$Consulta-si-1ra-TEF-se-hizo-en-dia-habil/Salida/ns1:Informacion/ns1:Mensaje"/>
+                                            </pfx:MENSAJE>
+                                        </pfx:INFORMACION>
+                                        <pfx:RECOMENDACION>
+                                            <xsl:value-of select="'ERROR'"/>
+                                        </pfx:RECOMENDACION>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <pfx:INFORMACION>
+                                            <pfx:CODIGO>
+                                                <xsl:value-of select="$Consulta-si-1ra-TEF-se-hizo-en-dia-habil/Salida/ns1:Informacion/ns1:Codigo"/>
+                                            </pfx:CODIGO>
+                                            <pfx:RESULTADO>
+                                                <xsl:value-of select="concat($varResultado,$Consulta-si-1ra-TEF-se-hizo-en-dia-habil/Salida/ns1:Informacion/ns1:Resultado,'; Segunda transferencia',&#xA;' - Fecha 1ra TEF:',$Info_1raTEF/root/FechaSP_fch_hra_lnz_trn,&#xA;' - Fecha 2da TEF desde:',$Map-2da-TEF-Desde/root/FechaDesde_dia_mes)"/>
+                                            </pfx:RESULTADO>
+                                            <pfx:MENSAJE>
+                                                <xsl:value-of select="if ($Map-2da-TEF-Desde/root/FechaDesde_MayorA2daTEF='true') then &#xA;concat('Podrás volver a transferir a este destinatario el día ',$Map-2da-TEF-Desde/root/dd_de_mmm_a_las_hh_mm,' hrs.')&#xA;else $Consulta-si-1ra-TEF-se-hizo-en-dia-habil/Salida/ns1:Informacion/ns1:Mensaje"/>
+                                            </pfx:MENSAJE>
+                                        </pfx:INFORMACION>
+                                        <pfx:RECOMENDACION>
+                                            <xsl:value-of select="if ($Consulta-Siguiente-Dia-Habil/Salida/ns1:Informacion/ns1:Codigo=$_globalVariables/ns2:GlobalVariables/INFO/CodigoError) then 'ERROR' else &#xA;if ($Map-2da-TEF-Desde/root/FechaDesde_MayorA2daTEF='false') then 'Allow' else 'Decline'"/>
+                                        </pfx:RECOMENDACION>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                                <xsl:for-each select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:ResultSet1/ns5:Record1[ns5:COD_PCA=222]">
+                                    <pfx:POLITICAS>
+                                        <pfx:CODIGO>
+                                            <xsl:value-of select="ns5:COD_PCA"/>
+                                        </pfx:CODIGO>
+                                        <pfx:DESCRIPCION>
+                                            <xsl:value-of select="concat(floor(number(ns5:VAL_PMT)),':00:00')"/>
+                                        </pfx:DESCRIPCION>
+                                        <pfx:VALOR>
+                                            <xsl:value-of select="ns5:VAL_PMT"/>
+                                        </pfx:VALOR>
+                                    </pfx:POLITICAS>
+                                </xsl:for-each>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <pfx:INFORMACION>
+                                    <pfx:CODIGO>
+                                        <xsl:choose>
+                                            <xsl:when test="exists($Consulta-Estado-Beneficiario/ns4:outputSet/ns1:Informacion/ns1:Codigo)">
+                                                <xsl:value-of select="$Consulta-Estado-Beneficiario/ns4:outputSet/ns1:Informacion/ns1:Codigo"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </pfx:CODIGO>
+                                    <pfx:RESULTADO>
+                                        <xsl:value-of select="concat($varResultado,$Consulta-Estado-Beneficiario/ns4:outputSet/ns1:Informacion/ns1:Resultado)"/>
+                                    </pfx:RESULTADO>
+                                    <pfx:MENSAJE>
+                                        <xsl:choose>
+                                            <xsl:when test="exists($Consulta-Estado-Beneficiario/ns4:outputSet/ns1:Informacion/ns1:Mensaje)">
+                                                <xsl:value-of select="$Consulta-Estado-Beneficiario/ns4:outputSet/ns1:Informacion/ns1:Mensaje"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:attribute name="xsi:nil">true</xsl:attribute>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </pfx:MENSAJE>
+                                </pfx:INFORMACION>
+                                <pfx:RECOMENDACION>
+                                    <xsl:value-of select="if ($Consulta-Estado-Beneficiario/ns4:outputSet/ns1:Informacion/ns1:Codigo=$_globalVariables/ns2:GlobalVariables/INFO/CodigoError) then 'ERROR' else 'Allow'"/>
+                                </pfx:RECOMENDACION>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <pfx:INFORMACION>
+                            <pfx:CODIGO>
+                                <xsl:value-of select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns1:Informacion/ns1:Codigo"/>
+                            </pfx:CODIGO>
+                            <pfx:RESULTADO>
+                                <xsl:value-of select="concat($varResultado,$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns1:Informacion/ns1:Resultado, &#xA;'; Flag Politicas en APS = ',$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:OUT_FLG_EST_FNC)"/>
+                            </pfx:RESULTADO>
+                            <pfx:MENSAJE>
+                                <xsl:value-of select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns1:Informacion/ns1:Mensaje"/>
+                            </pfx:MENSAJE>
+                        </pfx:INFORMACION>
+                        <pfx:RECOMENDACION>
+                            <xsl:value-of select="if ($Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:OUT_FLG_EST_FNC='NO') then 'Decline' else 'N/A - Modo Consulta'"/>
+                        </pfx:RECOMENDACION>
+                        <xsl:if test="exists($Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:MODO_CONSULTA)">
+                            <xsl:for-each select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:ResultSet1/ns5:Record1">
+                                <pfx:POLITICAS>
+                                    <pfx:CODIGO>
+                                        <xsl:value-of select="ns5:COD_PCA"/>
+                                    </pfx:CODIGO>
+                                    <pfx:DESCRIPCION>
+                                        <xsl:value-of select="''"/>
+                                    </pfx:DESCRIPCION>
+                                    <pfx:VALOR>
+                                        <xsl:value-of select="ns5:VAL_PMT"/>
+                                    </pfx:VALOR>
+                                </pfx:POLITICAS>
+                            </xsl:for-each>
+                        </xsl:if>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </pfx:OUTPUT>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>52</pd:x>
+        <pd:y>264</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>true</validateOutput>
+            <term ref="pfx3:DATA"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="concat('&lt;DATA>',$Start/pfx:INPUT/pfx:DATOS_TRANSACCION/pfx:DATA,'&lt;/DATA>')"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Iteracion Sig Dia Habil">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>771</pd:x>
+        <pd:y>405</pd:y>
+        <config>
+            <variableName>Info_PoliticaFecha</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <PoliticaEnHoras>
+                    <xsl:value-of select="$Info_PoliticaFecha/root/PoliticaEnHoras"/>
+                </PoliticaEnHoras>
+                <IteracionDiaHabil>
+                    <xsl:value-of select="ceiling($Info_PoliticaFecha/root/PoliticaEnHoras div 24) + (if ($Info_1raTEF/root/DiaHabil='true') then 0 else 1)"/>
+                </IteracionDiaHabil>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="PrimeraTEF diaHabil">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>620</pd:x>
+        <pd:y>406</pd:y>
+        <config>
+            <variableName>Info_1raTEF</variableName>
+        </config>
+        <pd:inputBindings>
+            <xsl:variable name="varDiaHabil" select="$Consulta-si-1ra-TEF-se-hizo-en-dia-habil/Salida/ns0:TIB_TCFE_CONDatosFeriados_Response/ns0:OUTPUT/ns0:ESCALARES1/ns0:GLSINDD='HABIL'"/>
+            <root>
+                <FechaSP_fch_hra_lnz_trn>
+                    <xsl:value-of select="$Info_1raTEF/root/FechaSP_fch_hra_lnz_trn"/>
+                </FechaSP_fch_hra_lnz_trn>
+                <DiaHabil>
+                    <xsl:value-of select="$varDiaHabil"/>
+                </DiaHabil>
+                <HoraSigTEF>
+                    <xsl:value-of select="$Info_1raTEF/root/HoraSigTEF"/>
+                </HoraSigTEF>
+                <Dia_aaaammdd>
+                    <xsl:value-of select="$Info_1raTEF/root/Dia_aaaammdd"/>
+                </Dia_aaaammdd>
+                <Dia_ddmmaaaa>
+                    <xsl:value-of select="$Info_1raTEF/root/Dia_ddmmaaaa"/>
+                </Dia_ddmmaaaa>
+                <Hora_hhmmss>
+                    <xsl:value-of select="$Info_1raTEF/root/Hora_hhmmss"/>
+                </Hora_hhmmss>
+                <DiaHabil_y_2daTEFDesdeMismoDia>
+                    <xsl:value-of select="$varDiaHabil = 'true' and $Info_1raTEF/root/HoraSigTEF&lt;24"/>
+                </DiaHabil_y_2daTEFDesdeMismoDia>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Informacion Horas Politica 222">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>210</pd:x>
+        <pd:y>410</pd:y>
+        <config>
+            <variableName>Info_PoliticaFecha</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <PoliticaEnHoras>
+                    <xsl:value-of select="number($Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:ResultSet1/ns5:Record1[ns5:COD_PCA=222]/ns5:VAL_PMT)"/>
+                </PoliticaEnHoras>
+                <IteracionDiaHabil>
+                    <xsl:value-of select="0"/>
+                </IteracionDiaHabil>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Informacion Sig Dia Habil">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>346</pd:x>
+        <pd:y>282</pd:y>
+        <config>
+            <variableName>Info_SigDiaHabil</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <Fecha>
+                    <xsl:value-of select="$Info_1raTEF/root/Dia_ddmmaaaa"/>
+                </Fecha>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Consulta Politicas De Ambiente</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>Consulta Estado Beneficiario</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Consulta Politicas De Ambiente</pd:from>
+        <pd:to>Map OUTPUT</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map OUTPUT</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Consulta Politicas De Ambiente</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:xpathDescription>Pol activas</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>exists($Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:MODO_EVALUACION) and $Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:OUT_FLG_EST_FNC='SI'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Consulta Estado Beneficiario</pd:from>
+        <pd:to>Map OUTPUT</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group</pd:from>
+        <pd:to>Map 2da TEF Desde</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Consulta Estado Beneficiario</pd:from>
+        <pd:to>Informacion Horas Politica 222</pd:to>
+        <pd:xpathDescription>2da TEF</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>number($Consulta-Estado-Beneficiario/ns4:outputSet/ns4:Resultsets/ns4:ResultSet1/ns4:Record1/ns4:ind_tef)=2</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Consulta si 1ra TEF se hizo en dia habil</pd:from>
+        <pd:to>PrimeraTEF diaHabil</pd:to>
+        <pd:xpathDescription>Ok</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>exists($Consulta-si-1ra-TEF-se-hizo-en-dia-habil/Salida/ns0:TIB_TCFE_CONDatosFeriados_Response/ns0:OUTPUT/ns0:ESCALARES1/ns0:GLSINDD)</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Consulta si 1ra TEF se hizo en dia habil</pd:from>
+        <pd:to>Map OUTPUT</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>Log Catch</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log Catch</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Iteracion Sig Dia Habil</pd:from>
+        <pd:to>Group</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log 2da TEF Desde</pd:from>
+        <pd:to>Map OUTPUT</pd:to>
+        <pd:xpathDescription/>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Informacion Segunda TEF</pd:from>
+        <pd:to>Consulta si 1ra TEF se hizo en dia habil</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Informacion Horas Politica 222</pd:from>
+        <pd:to>Informacion PrimeraTEF fecha</pd:to>
+        <pd:xpathDescription>2da &gt; 1ra</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Info_PoliticaFecha/root/PoliticaEnHoras &gt; 0 and tib:compare-dateTime($Consulta-Estado-Beneficiario/ns4:outputSet/ns4:Resultsets/ns4:ResultSet1/ns4:Record1/ns4:fch_hra_lnz_trn, $Parse-XML/DATA/FECHA_TEF) = -1</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Informacion PrimeraTEF fecha</pd:from>
+        <pd:to>Informacion Segunda TEF</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:description>2da TEF menor o igual a la 1ra TEF o Politica en 0</pd:description>
+        <pd:from>Informacion Horas Politica 222</pd:from>
+        <pd:to>Map OUTPUT</pd:to>
+        <pd:xpathDescription>2da &lt;= 1ra</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Informacion PrimeraTEF fecha</pd:from>
+        <pd:to>Informacion Sig Dia Habil</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Informacion Sig Dia Habil</pd:from>
+        <pd:to>Consulta si 1ra TEF se hizo en dia habil</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>PrimeraTEF diaHabil</pd:from>
+        <pd:to>Map 2da TEF Desde</pd:to>
+        <pd:xpathDescription>2da desde mismo día</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Info_1raTEF/root/DiaHabil_y_2daTEFDesdeMismoDia='true'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>PrimeraTEF diaHabil</pd:from>
+        <pd:to>Iteracion Sig Dia Habil</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map 2da TEF Desde</pd:from>
+        <pd:to>Log 2da TEF Desde</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/BancoRiesgoso.xsd" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Resources/Schemas/ManejoCursorBancoRiesgoso.xsd" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/BancoRiesgoso.xsd" schemaLocation="/Resources/Schemas/BancoRiesgoso.xsd"/>
+    <xsd:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" schemaLocation="/Resources/Schemas/Informacion.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Resources/Schemas/ManejoCursorBancoRiesgoso.xsd" schemaLocation="/Resources/Schemas/ManejoCursorBancoRiesgoso.xsd"/>
+    <pd:name>Process/SubProcess/CL1SPORAC_CONPoliticasPersonasPRSNA.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:inputSet"/>
+    <pd:startX>40</pd:startX>
+    <pd:startY>58</pd:startY>
+    <pd:returnBindings>
+        <pfx:outputSET>
+            <xsl:choose>
+                <xsl:when test="not(exists($_error/ns1:ErrorReport)) and count($Parse-XML/Resultsets/ResultSet1/Record1)=0">
+                    <ns2:Informacion>
+                        <ns2:Codigo>
+                            <xsl:value-of select="$_globalVariables/ns:GlobalVariables/INFO/CodigoError"/>
+                        </ns2:Codigo>
+                        <ns2:Resultado>
+                            <xsl:value-of select="$ControlDeErrores/ns2:Informacion/ns2:Resultado"/>
+                        </ns2:Resultado>
+                        <ns2:Mensaje>
+                            <xsl:value-of select="'Politica no encontrada'"/>
+                        </ns2:Mensaje>
+                    </ns2:Informacion>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:copy-of select="$ControlDeErrores/ns2:Informacion"/>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:if test="$JDBC-Call-Procedure/resultSet/outputSet/OUT_FLG_EST_FNC">
+                <pfx:OUT_FLG_EST_FNC>
+                    <xsl:value-of select="$JDBC-Call-Procedure/resultSet/outputSet/OUT_FLG_EST_FNC"/>
+                </pfx:OUT_FLG_EST_FNC>
+            </xsl:if>
+            <xsl:if test="not(($JDBC-Call-Procedure/resultSet/outputSet/OUT_FLG_EST_PCA/@xsi:nil=(&quot;true&quot;)) or ($JDBC-Call-Procedure/resultSet/outputSet/OUT_FLG_EST_PCA/@xsi:nil=(&quot;1&quot;)))">
+                <pfx:OUT_FLG_EST_PCA>
+                    <xsl:value-of select="$JDBC-Call-Procedure/resultSet/outputSet/OUT_FLG_EST_PCA"/>
+                </pfx:OUT_FLG_EST_PCA>
+            </xsl:if>
+            <xsl:if test="$JDBC-Call-Procedure/resultSet/outputSet/WS_WARNING">
+                <pfx:WS_WARNING>
+                    <xsl:value-of select="$JDBC-Call-Procedure/resultSet/outputSet/WS_WARNING"/>
+                </pfx:WS_WARNING>
+            </xsl:if>
+            <pfx:ResultSet1>
+                <xsl:for-each select="$Parse-XML/Resultsets/ResultSet1/Record1">
+                    <pfx:Record1>
+                        <xsl:if test="COD_PCA">
+                            <pfx:COD_PCA>
+                                <xsl:value-of select="COD_PCA"/>
+                            </pfx:COD_PCA>
+                        </xsl:if>
+                        <xsl:if test="VAL_PMT">
+                            <pfx:VAL_PMT>
+                                <xsl:value-of select="VAL_PMT"/>
+                            </pfx:VAL_PMT>
+                        </xsl:if>
+                    </pfx:Record1>
+                </xsl:for-each>
+            </pfx:ResultSet1>
+        </pfx:outputSET>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx:outputSET"/>
+    <pd:endX>682</pd:endX>
+    <pd:endY>183</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Process/Main/CL1CO_CONBancoRiesgoso</pd:targetNamespace>
+    <pd:activity name="Map Data">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>144</pd:x>
+        <pd:y>58</pd:y>
+        <config>
+            <element>
+                <xsd:element name="elemento" type="xsd:string"/>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <elemento>
+                <xsl:value-of select="concat($_globalVariables/ns:GlobalVariables/CONNECTIONS/BBDD/MSSQL/BD_HOB_TEF/ConsultaBeneficiarioNuevo,'.',&#xA;$_globalVariables/ns:GlobalVariables/CONNECTIONS/BBDD/MSSQL/BD_HOB_TEF/Package,'.',&#xA;$_globalVariables/ns:GlobalVariables/CONNECTIONS/BBDD/MSSQL/BD_HOB_TEF/Schema)"/>
+            </elemento>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Log Entrada">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>258</pd:x>
+        <pd:y>57</pd:y>
+        <config>
+            <processName>/Process/SubProcess/EscribeEnElLog.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <Proceso>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                </Proceso>
+                <Mensaje>
+                    <titulo>
+                        <xsl:value-of select="concat('Datos de entrada SP',$Map-Data/elemento)"/>
+                    </titulo>
+                    <xml>
+                        <xsl:copy-of select="$Start/pfx:inputSet"/>
+                    </xml>
+                </Mensaje>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC Call Procedure">
+        <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+        <pd:x>386</pd:x>
+        <pd:y>62</pd:y>
+        <config>
+            <timeout>%%CONNECTIONS/BBDD/Timeout%%</timeout>
+            <maxRows>%%CONNECTIONS/BBDD/MaxRows%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Resources/Connections/ORACLE/ACGEN.sharedjdbc</jdbcSharedConfig>
+            <schema>%%CONNECTIONS/BBDD/ORACLE/ACGEN/DBO_APS/Schema%%</schema>
+            <catalog>%%CONNECTIONS/BBDD/ORACLE/ACGEN/DBO_APS/PKG_APS_AMBTE/Package%%</catalog>
+            <ProcedureName>%%CONNECTIONS/BBDD/ORACLE/ACGEN/DBO_APS/PKG_APS_AMBTE/ConBancoExepcion%%</ProcedureName>
+            <parameterTypes>
+                <parameter>
+                    <colName>IN_COD_CNL_LGC</colName>
+                    <colType>1</colType>
+                    <dataType>1</dataType>
+                    <typeName>CHAR</typeName>
+                </parameter>
+                <parameter>
+                    <colName>IN_COD_FNC</colName>
+                    <colType>1</colType>
+                    <dataType>1</dataType>
+                    <typeName>CHAR</typeName>
+                </parameter>
+                <parameter>
+                    <colName>IN_COD_TPO_FNC</colName>
+                    <colType>1</colType>
+                    <dataType>1</dataType>
+                    <typeName>CHAR</typeName>
+                </parameter>
+                <parameter>
+                    <colName>IN_TPO_MND</colName>
+                    <colType>1</colType>
+                    <dataType>1</dataType>
+                    <typeName>CHAR</typeName>
+                </parameter>
+                <parameter>
+                    <colName>IN_COD_SGM</colName>
+                    <colType>1</colType>
+                    <dataType>1</dataType>
+                    <typeName>CHAR</typeName>
+                </parameter>
+                <parameter>
+                    <colName>IN_COD_BCO_RSG</colName>
+                    <colType>1</colType>
+                    <dataType>1</dataType>
+                    <typeName>CHAR</typeName>
+                </parameter>
+                <parameter>
+                    <colName>OUT_FLG_EST_FNC</colName>
+                    <colType>4</colType>
+                    <dataType>12</dataType>
+                    <typeName>VARCHAR2</typeName>
+                </parameter>
+                <parameter>
+                    <colName>OUT_FLG_EST_PCA</colName>
+                    <colType>4</colType>
+                    <dataType>12</dataType>
+                    <typeName>VARCHAR2</typeName>
+                </parameter>
+                <parameter>
+                    <colName>WS_WARNING</colName>
+                    <colType>4</colType>
+                    <dataType>12</dataType>
+                    <typeName>VARCHAR2</typeName>
+                </parameter>
+            </parameterTypes>
+        </config>
+        <pd:inputBindings>
+            <inputs>
+                <inputSet>
+                    <IN_COD_CNL_LGC>
+                        <xsl:value-of select="$Start/pfx:inputSet/pfx:IN_COD_CNL_LGC"/>
+                    </IN_COD_CNL_LGC>
+                    <IN_COD_FNC>
+                        <xsl:value-of select="$Start/pfx:inputSet/pfx:IN_COD_FNC"/>
+                    </IN_COD_FNC>
+                    <IN_COD_TPO_FNC>
+                        <xsl:value-of select="$Start/pfx:inputSet/pfx:IN_COD_TPO_FNC"/>
+                    </IN_COD_TPO_FNC>
+                    <IN_TPO_MND>
+                        <xsl:value-of select="$Start/pfx:inputSet/pfx:IN_TPO_MND"/>
+                    </IN_TPO_MND>
+                    <IN_COD_SGM>
+                        <xsl:value-of select="$Start/pfx:inputSet/pfx:IN_COD_SGM"/>
+                    </IN_COD_SGM>
+                    <IN_COD_BCO_RSG>
+                        <xsl:value-of select="$Start/pfx:inputSet/pfx:COD_BCO_RSG"/>
+                    </IN_COD_BCO_RSG>
+                </inputSet>
+            </inputs>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="LogRspSP">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>527</pd:x>
+        <pd:y>53</pd:y>
+        <config>
+            <processName>/Process/SubProcess/EscribeEnElLog.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <Proceso>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                </Proceso>
+                <Mensaje>
+                    <titulo>
+                        <xsl:value-of select="'Respuesta SP'"/>
+                    </titulo>
+                    <xml>
+                        <xsl:copy-of select="$JDBC-Call-Procedure/resultSet"/>
+                    </xml>
+                </Mensaje>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>672</pd:x>
+        <pd:y>58</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>true</validateOutput>
+            <term ref="pfx2:Resultsets"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$JDBC-Call-Procedure/resultSet/UnresolvedResultsets"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ControlDeErrores">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>398</pd:x>
+        <pd:y>185</pd:y>
+        <config>
+            <processName>/Process/SubProcess/ControlDeErrores.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <elemento>
+                    <xsl:value-of select="$Map-Data/elemento"/>
+                </elemento>
+                <WARNING>
+                    <xsl:value-of select="$JDBC-Call-Procedure/resultSet/outputSet/WS_WARNING"/>
+                </WARNING>
+                <xsl:copy select="contat('falta _error')"/>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="LogInformacion">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>554</pd:x>
+        <pd:y>183</pd:y>
+        <config>
+            <processName>/Process/SubProcess/EscribeEnElLog.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <Proceso>
+                    <xsl:value-of select="$_processContext/ns1:ProcessContext/ProcessId"/>
+                </Proceso>
+                <Mensaje>
+                    <titulo>
+                        <xsl:value-of select="'Respuesta del servicio'"/>
+                    </titulo>
+                    <xml>
+                        <xsl:copy-of select="$ControlDeErrores/ns2:Informacion"/>
+                    </xml>
+                </Mensaje>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ControlDeErroresCatch">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>797</pd:x>
+        <pd:y>187</pd:y>
+        <config>
+            <processName>/Process/SubProcess/ControlDeErrores.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <elemento>
+                    <xsl:value-of select="$Map-Data/elemento"/>
+                </elemento>
+                <WARNING>
+                    <xsl:value-of select="$JDBC-Call-Procedure/resultSet/outputSet/WS_WARNING"/>
+                </WARNING>
+                <xsl:copy-of select="$_error/ns1:ErrorReport"/>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>903</pd:x>
+        <pd:y>189</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Map Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data</pd:from>
+        <pd:to>Log Entrada</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log Entrada</pd:from>
+        <pd:to>JDBC Call Procedure</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Call Procedure</pd:from>
+        <pd:to>LogRspSP</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>LogRspSP</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>ControlDeErrores</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ControlDeErrores</pd:from>
+        <pd:to>LogInformacion</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Call Procedure</pd:from>
+        <pd:to>ControlDeErrores</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65485</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ControlDeErroresCatch</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ControlDeErroresCatch</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>LogInformacion</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

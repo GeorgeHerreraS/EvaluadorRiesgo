@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	 xmlns="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/ConsultaClientePreLife.xsd"
+	 targetNamespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/ConsultaClientePreLife.xsd"
+	 elementFormDefault="qualified"
+	 attributeFormDefault="unqualified">
+	<xs:element name="INPUT">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="DATOS_AMBIENTE">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CANAL_LGC" type="xs:string"/>
+							<xs:element name="IP_SERVIDOR" type="xs:string"/>
+							<xs:element name="RUT_CLIENTE" type="xs:string"/>
+							<xs:element name="CODIGO_PRODUCTO" type="xs:string"/>
+							<xs:element name="CODIGO_SUBPRODUCTO" type="xs:string"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OUTPUT">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="INFORMACION">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODIGO" type="xs:string"/>
+							<xs:element name="RESULTADO" type="xs:string"/>
+							<xs:element name="MENSAJE" type="xs:string"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="MONTO_MAXIMO_MISMO_BCO" type="xs:string"/>
+				<xs:element name="MONTO_MAXIMO_OTROS_BCOS" type="xs:string"/>
+				<xs:element name="PRE_LIFE" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

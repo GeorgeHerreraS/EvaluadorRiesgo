@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns4="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/SPORAC_ALTMontoTEFRealizada.xsd" xmlns:ns3="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" xmlns:pfx1="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/AltaMontoTEFRealizadaPreLife.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx="http://www.tibco.com/pe/WriteToLogActivitySchema">
+    <xsd:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/AltaMontoTEFRealizadaPreLife.xsd" schemaLocation="/Resources/Schemas/AltaMontoTEFRealizadaPreLife.xsd"/>
+    <pd:name>Process/Main/CL1CO_ALTMontoTEFRealizadaPreLife.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx1:INPUT"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>35</pd:startY>
+    <pd:returnBindings>
+        <pfx1:OUTPUT>
+            <xsl:choose>
+                <xsl:when test="string($Catch/exceptiondata/*)!=''">
+                    <pfx1:INFORMACION>
+                        <pfx1:CODIGO>
+                            <xsl:value-of select="$ControlDeErrores/ns3:Informacion/ns3:Codigo"/>
+                        </pfx1:CODIGO>
+                        <pfx1:RESULTADO>
+                            <xsl:value-of select="$ControlDeErrores/ns3:Informacion/ns3:Resultado"/>
+                        </pfx1:RESULTADO>
+                        <pfx1:MENSAJE>
+                            <xsl:value-of select="$ControlDeErrores/ns3:Informacion/ns3:Mensaje"/>
+                        </pfx1:MENSAJE>
+                    </pfx1:INFORMACION>
+                </xsl:when>
+                <!--PRE LIFE-->
+                <xsl:otherwise>
+                    <pfx1:INFORMACION>
+                        <pfx1:CODIGO>
+                            <xsl:value-of select="$Alta-Monto-TEF-Realizada-Pre-Life/ns4:outputSet/ns3:Informacion/ns3:Codigo"/>
+                        </pfx1:CODIGO>
+                        <pfx1:RESULTADO>
+                            <xsl:value-of select="$Alta-Monto-TEF-Realizada-Pre-Life/ns4:outputSet/ns3:Informacion/ns3:Resultado"/>
+                        </pfx1:RESULTADO>
+                        <pfx1:MENSAJE>
+                            <xsl:value-of select="$Alta-Monto-TEF-Realizada-Pre-Life/ns4:outputSet/ns3:Informacion/ns3:Mensaje"/>
+                        </pfx1:MENSAJE>
+                    </pfx1:INFORMACION>
+                    <xsl:if test="$Alta-Monto-TEF-Realizada-Pre-Life/ns4:outputSet/ns4:WS_WARNING">
+                        <pfx1:WS_WARNING>
+                            <xsl:value-of select="$Alta-Monto-TEF-Realizada-Pre-Life/ns4:outputSet/ns4:WS_WARNING"/>
+                        </pfx1:WS_WARNING>
+                    </xsl:if>
+                </xsl:otherwise>
+            </xsl:choose>
+        </pfx1:OUTPUT>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx1:OUTPUT"/>
+    <pd:endX>406</pd:endX>
+    <pd:endY>35</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Process/Main/CL1CO_ALTMontoTEFRealizadaPreLife</pd:targetNamespace>
+    <pd:activity name="Alta Monto TEF Realizada Pre Life">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>244</pd:x>
+        <pd:y>44</pd:y>
+        <config>
+            <processName>/Process/SubProcess/CL1SPORAC_ALTMontoTEFRealizada.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns4:inputSet>
+                <ns4:IN_COD_CNL_LGC>
+                    <xsl:value-of select="$Start/pfx1:INPUT/pfx1:CANAL_LGC"/>
+                </ns4:IN_COD_CNL_LGC>
+                <ns4:IN_COD_FNC>
+                    <xsl:value-of select="$Start/pfx1:INPUT/pfx1:COD_FUNCIONALIDAD"/>
+                </ns4:IN_COD_FNC>
+                <ns4:IN_COD_TPO_FNC>
+                    <xsl:value-of select="$Start/pfx1:INPUT/pfx1:TIPO_FUNCIONALIDAD"/>
+                </ns4:IN_COD_TPO_FNC>
+                <ns4:IN_RUT_CLNTE>
+                    <xsl:value-of select="$Start/pfx1:INPUT/pfx1:RUT_CLIENTE"/>
+                </ns4:IN_RUT_CLNTE>
+                <ns4:IN_FEC_TRNCN>
+                    <xsl:value-of select="$Start/pfx1:INPUT/pfx1:FECHA_TEF"/>
+                </ns4:IN_FEC_TRNCN>
+                <ns4:IN_MNT_TRNCN>
+                    <xsl:value-of select="$Start/pfx1:INPUT/pfx1:MONTO_TEF"/>
+                </ns4:IN_MNT_TRNCN>
+            </ns4:inputSet>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>658</pd:x>
+        <pd:y>35</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+            <fault>localname=ValidationException namespace=http://schemas.tibco.com/bw/plugins/xml/5.0/xmlExceptions</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ControlDeErrores">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>533</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <processName>/Process/SubProcess/ControlDeErrores.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <elemento>
+                    <xsl:value-of select="''"/>
+                </elemento>
+                <xsl:copy-of select="$_error/ns2:ErrorReport"/>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Alta Monto TEF Realizada Pre Life</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Alta Monto TEF Realizada Pre Life</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ControlDeErrores</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ControlDeErrores</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

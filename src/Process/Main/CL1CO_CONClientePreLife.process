@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns2="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/ConsultaPoliticas.xsd" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:ns="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://www.tibco.com/pe/DeployedVarsType" xmlns:pfx3="http://www.tibco.com/schemas/AppGenericosGeneral2/Resources/Schemas/UserInfoEX.xsd" xmlns:pfx2="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" xmlns:pfx="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/ConsultaClientePreLife.xsd">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/ConsultaClientePreLife.xsd" schemaLocation="/Resources/Schemas/ConsultaClientePreLife.xsd"/>
+    <pd:name>Process/Main/CL1CO_CONClientePreLife.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx:INPUT"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>35</pd:startY>
+    <pd:returnBindings>
+        <pfx:OUTPUT>
+            <xsl:choose>
+                <!--PRE-LIFE-->
+                <xsl:when test="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:CODIGO_PRODUCTO=$_globalVariables/pfx4:GlobalVariables/PRELIFE/Producto and &#xA;$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:CODIGO_SUBPRODUCTO=$_globalVariables/pfx4:GlobalVariables/PRELIFE/SubProducto">
+                    <xsl:choose>
+                        <!--SIN SUPER CLAVE-->
+                        <xsl:when test="$WSUSERINFOEX-Consulta-CurusConnect/Salida/pfx2:Informacion/pfx2:Codigo=$_globalVariables/pfx4:GlobalVariables/INFO/CodigoOk and &#xA;count($WSUSERINFOEX-Consulta-CurusConnect/Salida/pfx3:userInfoExResponse/pfx3:challengeList/pfx3:challenges[pfx3:nameSet='GRID'])=0">
+                            <pfx:INFORMACION>
+                                <pfx:CODIGO>
+                                    <xsl:value-of select="$Consulta-Politicas-PreLife-Mismo-Banco/ns2:OUTPUT/ns2:INFORMACION/ns2:CODIGO"/>
+                                </pfx:CODIGO>
+                                <pfx:RESULTADO>
+                                    <xsl:value-of select="$Consulta-Politicas-PreLife-Mismo-Banco/ns2:OUTPUT/ns2:INFORMACION/ns2:RESULTADO"/>
+                                </pfx:RESULTADO>
+                                <pfx:MENSAJE>
+                                    <xsl:value-of select="$Consulta-Politicas-PreLife-Mismo-Banco/ns2:OUTPUT/ns2:INFORMACION/ns2:MENSAJE"/>
+                                </pfx:MENSAJE>
+                            </pfx:INFORMACION>
+                            <pfx:MONTO_MAXIMO_MISMO_BCO>
+                                <xsl:value-of select="$Consulta-Politicas-PreLife-Mismo-Banco/ns2:OUTPUT/ns2:MONTO_DISPONIBLE"/>
+                            </pfx:MONTO_MAXIMO_MISMO_BCO>
+                            <pfx:MONTO_MAXIMO_OTROS_BCOS>
+                                <xsl:value-of select="$Consulta-Politicas-PreLife-Otro-Banco/ns2:OUTPUT/ns2:MONTO_DISPONIBLE"/>
+                            </pfx:MONTO_MAXIMO_OTROS_BCOS>
+                            <pfx:PRE_LIFE>
+                                <xsl:value-of select="'SI'"/>
+                            </pfx:PRE_LIFE>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <pfx:INFORMACION>
+                                <pfx:CODIGO>
+                                    <xsl:value-of select="$WSUSERINFOEX-Consulta-CurusConnect/Salida/pfx2:Informacion/pfx2:Codigo"/>
+                                </pfx:CODIGO>
+                                <pfx:RESULTADO>
+                                    <xsl:value-of select="$WSUSERINFOEX-Consulta-CurusConnect/Salida/pfx2:Informacion/pfx2:Resultado"/>
+                                </pfx:RESULTADO>
+                                <pfx:MENSAJE>
+                                    <xsl:value-of select="$WSUSERINFOEX-Consulta-CurusConnect/Salida/pfx2:Informacion/pfx2:Mensaje"/>
+                                </pfx:MENSAJE>
+                            </pfx:INFORMACION>
+                            <pfx:MONTO_MAXIMO_MISMO_BCO>
+                                <xsl:value-of select="0"/>
+                            </pfx:MONTO_MAXIMO_MISMO_BCO>
+                            <pfx:MONTO_MAXIMO_OTROS_BCOS>
+                                <xsl:value-of select="0"/>
+                            </pfx:MONTO_MAXIMO_OTROS_BCOS>
+                            <pfx:PRE_LIFE>
+                                <xsl:value-of select="'NO'"/>
+                            </pfx:PRE_LIFE>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:when>
+                <xsl:otherwise>
+                    <pfx:INFORMACION>
+                        <pfx:CODIGO>
+                            <xsl:value-of select="$_globalVariables/pfx4:GlobalVariables/INFO/CodigoOk"/>
+                        </pfx:CODIGO>
+                        <pfx:RESULTADO>
+                            <xsl:value-of select="concat('Job-',$_processContext/ns1:ProcessContext/ProcessId,';',$_globalVariables/pfx4:GlobalVariables/INFO/MsjOk)"/>
+                        </pfx:RESULTADO>
+                        <pfx:MENSAJE>
+                            <xsl:value-of select="$_globalVariables/pfx4:GlobalVariables/INFO/MsjOk"/>
+                        </pfx:MENSAJE>
+                    </pfx:INFORMACION>
+                    <pfx:MONTO_MAXIMO_MISMO_BCO>
+                        <xsl:value-of select="0"/>
+                    </pfx:MONTO_MAXIMO_MISMO_BCO>
+                    <pfx:MONTO_MAXIMO_OTROS_BCOS>
+                        <xsl:value-of select="0"/>
+                    </pfx:MONTO_MAXIMO_OTROS_BCOS>
+                    <pfx:PRE_LIFE>
+                        <xsl:value-of select="'NO'"/>
+                    </pfx:PRE_LIFE>
+                </xsl:otherwise>
+            </xsl:choose>
+        </pfx:OUTPUT>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx:OUTPUT"/>
+    <pd:endX>545</pd:endX>
+    <pd:endY>35</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Process/Main/CL1CO_CONClientePreLife</pd:targetNamespace>
+    <pd:activity name="Consulta Politicas PreLife Mismo Banco">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>600</pd:x>
+        <pd:y>225</pd:y>
+        <config>
+            <processName>/Process/Main/CL1CO_CONPoliticas.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns2:INPUT>
+                <ns2:CANAL_LGC>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:CANAL_LGC"/>
+                </ns2:CANAL_LGC>
+                <ns2:COD_FUNCIONALIDAD>
+                    <xsl:value-of select="'01006'"/>
+                </ns2:COD_FUNCIONALIDAD>
+                <ns2:TIPO_FUNCIONALIDAD>
+                    <xsl:value-of select="'01'"/>
+                </ns2:TIPO_FUNCIONALIDAD>
+                <ns2:PRELIFE>
+                    <ns2:RUT_CLIENTE>
+                        <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:RUT_CLIENTE"/>
+                    </ns2:RUT_CLIENTE>
+                </ns2:PRELIFE>
+            </ns2:INPUT>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Consulta Politicas PreLife Otro Banco">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>750</pd:x>
+        <pd:y>303</pd:y>
+        <config>
+            <processName>/Process/Main/CL1CO_CONPoliticas.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns2:INPUT>
+                <ns2:CANAL_LGC>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:CANAL_LGC"/>
+                </ns2:CANAL_LGC>
+                <ns2:COD_FUNCIONALIDAD>
+                    <xsl:value-of select="'01007'"/>
+                </ns2:COD_FUNCIONALIDAD>
+                <ns2:TIPO_FUNCIONALIDAD>
+                    <xsl:value-of select="'01'"/>
+                </ns2:TIPO_FUNCIONALIDAD>
+                <ns2:PRELIFE>
+                    <ns2:RUT_CLIENTE>
+                        <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:RUT_CLIENTE"/>
+                    </ns2:RUT_CLIENTE>
+                </ns2:PRELIFE>
+            </ns2:INPUT>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Null">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>447</pd:x>
+        <pd:y>295</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="WSUSERINFOEX Consulta CurusConnect">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>235</pd:x>
+        <pd:y>310</pd:y>
+        <config>
+            <processName>/Process/SubProcess/WSUSERINFOEX-ConConsultaCurusConnect.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <ipAdress>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:IP_SERVIDOR"/>
+                </ipAdress>
+                <rutCliente>
+                    <xsl:value-of select="$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:RUT_CLIENTE"/>
+                </rutCliente>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>WSUSERINFOEX Consulta CurusConnect</pd:to>
+        <pd:xpathDescription>PreLife</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:CODIGO_PRODUCTO=$_globalVariables/pfx4:GlobalVariables/PRELIFE/Producto and 
+$Start/pfx:INPUT/pfx:DATOS_AMBIENTE/pfx:CODIGO_SUBPRODUCTO=$_globalVariables/pfx4:GlobalVariables/PRELIFE/SubProducto</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>WSUSERINFOEX Consulta CurusConnect</pd:from>
+        <pd:to>Null</pd:to>
+        <pd:xpathDescription>Sin Super Clave</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$WSUSERINFOEX-Consulta-CurusConnect/Salida/pfx2:Informacion/pfx2:Codigo=$_globalVariables/pfx4:GlobalVariables/INFO/CodigoOk and 
+count($WSUSERINFOEX-Consulta-CurusConnect/Salida/pfx3:userInfoExResponse/pfx3:challengeList/pfx3:challenges[pfx3:nameSet='GRID'])=0</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>Consulta Politicas PreLife Mismo Banco</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Null</pd:from>
+        <pd:to>Consulta Politicas PreLife Otro Banco</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Consulta Politicas PreLife Otro Banco</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Consulta Politicas PreLife Mismo Banco</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>WSUSERINFOEX Consulta CurusConnect</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns1="http://www.tibco.com/pe/EngineTypes" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns3="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx4="http://www.tibco.com/ns/no_namespace_schema_location/Resources/Schemas/SPSQL_CONEstadoBeneficiario_Record1.xsd" xmlns:pfx3="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/SPSQL_CONEstadoBeneficiario.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" schemaLocation="/Resources/Schemas/Informacion.xsd"/>
+    <xsd:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/SPSQL_CONEstadoBeneficiario.xsd" schemaLocation="/Resources/Schemas/SPSQL_CONEstadoBeneficiario.xsd"/>
+    <xsd:import namespace="http://www.tibco.com/ns/no_namespace_schema_location/Resources/Schemas/SPSQL_CONEstadoBeneficiario_Record1.xsd" schemaLocation="/Resources/Schemas/SPSQL_CONEstadoBeneficiario_Record1.xsd"/>
+    <pd:name>Process/SubProcess/CL1SPSQL_CONEstadoBeneficiario.process</pd:name>
+    <pd:description>Permite la ejecución de SP Coordinador para validar las políticas de montos y horas TRNX</pd:description>
+    <pd:startName>Start</pd:startName>
+    <pd:startType ref="pfx3:inputSet"/>
+    <pd:startX>27</pd:startX>
+    <pd:startY>35</pd:startY>
+    <pd:returnBindings>
+        <pfx3:outputSet>
+            <xsl:copy-of select="$ControlDeErrores/ns3:Informacion"/>
+            <pfx3:RETURN_VALUE>
+                <xsl:value-of select="$JDBC-Call-Procedure/resultSet/outputSet/RETURN_VALUE"/>
+            </pfx3:RETURN_VALUE>
+            <pfx3:Resultsets>
+                <pfx3:ResultSet1>
+                    <pfx3:Record1>
+                        <pfx3:ind_tef>
+                            <xsl:value-of select="$Parse-XML/Resultsets/ResultSet1/Record1/ind_tef"/>
+                        </pfx3:ind_tef>
+                        <pfx3:fch_hra_lnz_trn>
+                            <xsl:value-of select="$Parse-XML/Resultsets/ResultSet1/Record1/fch_hra_lnz_trn"/>
+                        </pfx3:fch_hra_lnz_trn>
+                        <pfx3:mnt_tef>
+                            <xsl:value-of select="$Parse-XML/Resultsets/ResultSet1/Record1/mnt_tef"/>
+                        </pfx3:mnt_tef>
+                    </pfx3:Record1>
+                </pfx3:ResultSet1>
+            </pfx3:Resultsets>
+        </pfx3:outputSet>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType ref="pfx3:outputSet"/>
+    <pd:endX>688</pd:endX>
+    <pd:endY>169</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://itg.Santander.cl/AppEvaluadorRiesgo_Persona/Process/SubProcess/CL1SPSQL_CONEstadoBeneficiario</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>1001</pd:x>
+        <pd:y>168</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ControlDeErrores">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>378</pd:x>
+        <pd:y>168</pd:y>
+        <config>
+            <processName>/Process/SubProcess/ControlDeErrores.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <elemento>
+                    <xsl:value-of select="concat($_globalVariables/ns2:GlobalVariables/CONNECTIONS/BBDD/MSSQL/BD_HOB_TEF/Schema,'.',&#xA;$_globalVariables/ns2:GlobalVariables/CONNECTIONS/BBDD/MSSQL/BD_HOB_TEF/Package,'.',&#xA;$_globalVariables/ns2:GlobalVariables/CONNECTIONS/BBDD/MSSQL/BD_HOB_TEF/ConsultaBeneficiarioNuevo)"/>
+                </elemento>
+                <WARNING>
+                    <xsl:value-of select="$JDBC-Call-Procedure/resultSet/outputSet/RETURN_VALUE"/>
+                </WARNING>
+                <xsl:copy-of select="$_error/ns1:ErrorReport"/>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Log Entrada">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>245</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <processName>/Process/SubProcess/EscribeEnElLog.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <Proceso>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                </Proceso>
+                <Mensaje>
+                    <titulo>
+                        <xsl:value-of select="concat('Datos de entrada al SP: ',$Map-Data/elemento)"/>
+                    </titulo>
+                    <xml>
+                        <xsl:copy-of select="$Start/*"/>
+                    </xml>
+                </Mensaje>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Log Rsp SP">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>492</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <processName>/Process/SubProcess/EscribeEnElLog.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <Proceso>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                </Proceso>
+                <Mensaje>
+                    <titulo>
+                        <xsl:value-of select="'Respuesta SP'"/>
+                    </titulo>
+                    <xml>
+                        <xsl:copy-of select="$JDBC-Call-Procedure/resultSet"/>
+                    </xml>
+                </Mensaje>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Log Informacion">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>572</pd:x>
+        <pd:y>168</pd:y>
+        <config>
+            <processName>/Process/SubProcess/EscribeEnElLog.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <Proceso>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns1:ProcessContext/ProcessId)"/>
+                </Proceso>
+                <Mensaje>
+                    <titulo>
+                        <xsl:value-of select="'Respuesta del servicio'"/>
+                    </titulo>
+                    <xml>
+                        <xsl:copy-of select="$ControlDeErrores/ns3:Informacion"/>
+                    </xml>
+                </Mensaje>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="JDBC Call Procedure">
+        <pd:type>com.tibco.plugin.jdbc.JDBCCallActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCCallActivity</pd:resourceType>
+        <pd:x>378</pd:x>
+        <pd:y>43</pd:y>
+        <config>
+            <timeout>%%CONNECTIONS/BBDD/Timeout%%</timeout>
+            <maxRows>%%CONNECTIONS/BBDD/MaxRows%%</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Resources/Connections/MSSQL/BD_HOB_TEF.sharedjdbc</jdbcSharedConfig>
+            <catalog>%%CONNECTIONS/BBDD/MSSQL/BD_HOB_TEF/Package%%</catalog>
+            <schema>%%CONNECTIONS/BBDD/MSSQL/BD_HOB_TEF/Schema%%</schema>
+            <ProcedureName>%%CONNECTIONS/BBDD/MSSQL/BD_HOB_TEF/ConsultaBeneficiarioNuevo%%</ProcedureName>
+            <parameterTypes>
+                <parameter>
+                    <colName>@RETURN_VALUE</colName>
+                    <colType>5</colType>
+                    <dataType>4</dataType>
+                    <typeName>int</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@nro_doc_cgo</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@nro_cta_cgo_usr_innet</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@nro_doc_abn</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@nro_cta_abn</colName>
+                    <colType>1</colType>
+                    <dataType>12</dataType>
+                    <typeName>varchar</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@mnt_tef</colName>
+                    <colType>1</colType>
+                    <dataType>2</dataType>
+                    <typeName>numeric</typeName>
+                </parameter>
+                <parameter>
+                    <colName>@fch_hra_cgo</colName>
+                    <colType>1</colType>
+                    <dataType>93</dataType>
+                    <typeName>datetime</typeName>
+                </parameter>
+            </parameterTypes>
+        </config>
+        <pd:inputBindings>
+            <inputs>
+                <inputSet>
+                    <nro_doc_cgo>
+                        <xsl:value-of select="$Start/pfx3:inputSet/pfx3:nro_doc_cgo"/>
+                    </nro_doc_cgo>
+                    <nro_cta_cgo_usr_innet>
+                        <xsl:value-of select="$Start/pfx3:inputSet/pfx3:nro_cta_cgo_usr_innet"/>
+                    </nro_cta_cgo_usr_innet>
+                    <nro_doc_abn>
+                        <xsl:value-of select="$Start/pfx3:inputSet/pfx3:nro_doc_abn"/>
+                    </nro_doc_abn>
+                    <nro_cta_abn>
+                        <xsl:value-of select="$Start/pfx3:inputSet/pfx3:nro_cta_abn"/>
+                    </nro_cta_abn>
+                    <mnt_tef>
+                        <xsl:value-of select="$Start/pfx3:inputSet/pfx3:mnt_tef"/>
+                    </mnt_tef>
+                    <fch_hra_cgo xsi:nil="true"/>
+                </inputSet>
+            </inputs>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="ControlDeErrores Catch">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>842</pd:x>
+        <pd:y>174</pd:y>
+        <config>
+            <processName>/Process/SubProcess/ControlDeErrores.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <elemento>
+                    <xsl:value-of select="$Map-Data/elemento"/>
+                </elemento>
+                <WARNING>
+                    <xsl:value-of select="$JDBC-Call-Procedure/resultSet/outputSet/RETURN_VALUE"/>
+                </WARNING>
+                <xsl:copy-of select="$_error/ns1:ErrorReport"/>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map Data">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>135</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <element>
+                <xsd:element name="elemento" type="xsd:string"/>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <elemento>
+                <xsl:value-of select="concat($_globalVariables/ns2:GlobalVariables/CONNECTIONS/BBDD/MSSQL/BD_HOB_TEF/Schema,'.',&#xA;$_globalVariables/ns2:GlobalVariables/CONNECTIONS/BBDD/MSSQL/BD_HOB_TEF/Package,'.',&#xA;$_globalVariables/ns2:GlobalVariables/CONNECTIONS/BBDD/MSSQL/BD_HOB_TEF/ConsultaBeneficiarioNuevo)"/>
+            </elemento>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>615</pd:x>
+        <pd:y>38</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>false</validateOutput>
+            <term>
+                <xsd:element name="Resultsets">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="ResultSet1">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element ref="pfx4:Record1"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </term>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$JDBC-Call-Procedure/resultSet/UnresolvedResultsets"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Map Data</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ControlDeErrores Catch</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Call Procedure</pd:from>
+        <pd:to>ControlDeErrores</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>error</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JDBC Call Procedure</pd:from>
+        <pd:to>Log Rsp SP</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log Entrada</pd:from>
+        <pd:to>JDBC Call Procedure</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log Rsp SP</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ControlDeErrores</pd:from>
+        <pd:to>Log Informacion</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log Informacion</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ControlDeErrores Catch</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-65536</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data</pd:from>
+        <pd:to>Log Entrada</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
+        <pd:to>ControlDeErrores</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

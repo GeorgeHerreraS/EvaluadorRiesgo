@@ -1,0 +1,838 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:ns2="http://www.tibco.com/pe/DeployedVarsType" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:BW="java://com.tibco.pe.core.JavaCustomXPATHFunctions" xmlns:ns1="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns4="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/SPSQL_CONEstadoBeneficiario.xsd" xmlns:ns="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:ns3="http://www.tibco.com/pe/EngineTypes" xmlns:ns0="http://itg.isban.cl/AppOfficeBanking/Schemas/TCFE.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:pfx2="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/SPORAC_CONUsuarioExcepcionadoBN.xsd" xmlns:ns5="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/SPORAC_CONPoliticasDeAmbiente.xsd" xmlns:ns6="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/SPORAC_CONPoliticasDeAmbienteACT.xsd" xmlns:pfx="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/BeneficiarioNuevo.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/BeneficiarioNuevo.xsd" schemaLocation="/Resources/Schemas/BeneficiarioNuevo.xsd"/>
+    <xsd:import namespace="http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Resources/Schemas/Informacion.xsd" schemaLocation="/Resources/Schemas/Informacion.xsd"/>
+    <pd:name>Process/SubProcess/ValidacionBeneficiarioNuevo.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="Entrada">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="CANAL_LGC" type="xsd:string"/>
+                    <xsd:element name="USUARIO_ALT" type="xsd:string"/>
+                    <xsd:element name="COD_FUNCIONALIDAD" type="xsd:string"/>
+                    <xsd:element name="TIPO_FUNCIONALIDAD" type="xsd:string"/>
+                    <xsd:element name="CODIGO_MONEDA" type="xsd:string"/>
+                    <xsd:element name="ControlBeneficiarioNuevo">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="RUT_CARGO" type="xsd:string"/>
+                                <xsd:element name="RUT_ABONO" type="xsd:string"/>
+                                <xsd:element name="CUENTA_ABONO" type="xsd:string"/>
+                                <xsd:element name="FECHA_TEF" type="xsd:string"/>
+                                <xsd:element name="MONTO_TEF" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="ClientePreLife" type="xsd:boolean"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>27</pd:startX>
+    <pd:startY>35</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <xsl:choose>
+                <xsl:when test="string($Catch/exceptiondata/*)!=''">
+                    <xsl:copy-of select="$ControlDeErrores/ns1:Informacion"/>
+                    <Recomendacion>
+                        <xsl:value-of select="'ERROR'"/>
+                    </Recomendacion>
+                    <xsl:for-each select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:ResultSet1/ns5:Record1">
+                        <Politicas>
+                            <codigo>
+                                <xsl:value-of select="ns5:COD_PCA"/>
+                            </codigo>
+                            <valor>
+                                <xsl:value-of select="ns5:VAL_PMT"/>
+                            </valor>
+                            <descripcion>
+                                <xsl:value-of select="ns5:DESCRIPCION"/>
+                            </descripcion>
+                            <valorFormateado>
+                                <xsl:value-of select="ns5:VALOR_FORMATEADO"/>
+                            </valorFormateado>
+                        </Politicas>
+                    </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:copy-of select="$Map-OUTPUT/root/ns1:Informacion"/>
+                    <Recomendacion>
+                        <xsl:value-of select="$Map-OUTPUT/root/Recomendacion"/>
+                    </Recomendacion>
+                    <xsl:copy-of select="$Map-OUTPUT/root/Politicas"/>
+                </xsl:otherwise>
+            </xsl:choose>
+            <IndicadorBeneficiario>
+                <xsl:value-of select="$Map-OUTPUT/root/IndicadorBeneficiario"/>
+            </IndicadorBeneficiario>
+            <MontoPoliticaPreLife>
+                <xsl:value-of select="$Map-OUTPUT/root/MontoPoliticaPreLife"/>
+            </MontoPoliticaPreLife>
+            <FlagPoliticaActiva>
+                <xsl:value-of select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:OUT_FLG_EST_PCA"/>
+            </FlagPoliticaActiva>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element ref="ns1:Informacion"/>
+                    <xsd:element name="Recomendacion" type="xsd:string"/>
+                    <xsd:element name="Politicas" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="codigo" type="xsd:string"/>
+                                <xsd:element name="valor" type="xsd:string"/>
+                                <xsd:element name="descripcion" type="xsd:string"/>
+                                <xsd:element name="valorFormateado" type="xsd:string"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="IndicadorBeneficiario" type="xsd:string"/>
+                    <xsd:element name="MontoPoliticaPreLife" type="xsd:string"/>
+                    <xsd:element name="FlagPoliticaActiva" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>906</pd:endX>
+    <pd:endY>35</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://itg.santander.cl/AppEvaluadorRiesgo_Persona/Process/SubProcess/ValidacionBeneficiarioNuevo</pd:targetNamespace>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>1201</pd:x>
+        <pd:y>35</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+            <fault>localname=ValidationException namespace=http://schemas.tibco.com/bw/plugins/xml/5.0/xmlExceptions</fault>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="Consulta Estado Beneficiario">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>394</pd:x>
+        <pd:y>298</pd:y>
+        <config>
+            <processName>/Process/SubProcess/CL1SPSQL_CONEstadoBeneficiario.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns4:inputSet>
+                <ns4:nro_doc_cgo>
+                    <xsl:value-of select="$Start/Entrada/ControlBeneficiarioNuevo/RUT_CARGO"/>
+                </ns4:nro_doc_cgo>
+                <ns4:nro_cta_cgo_usr_innet>
+                    <xsl:value-of select="''"/>
+                </ns4:nro_cta_cgo_usr_innet>
+                <ns4:nro_doc_abn>
+                    <xsl:value-of select="$Start/Entrada/ControlBeneficiarioNuevo/RUT_ABONO"/>
+                </ns4:nro_doc_abn>
+                <ns4:nro_cta_abn>
+                    <xsl:value-of select="$Start/Entrada/ControlBeneficiarioNuevo/CUENTA_ABONO"/>
+                </ns4:nro_cta_abn>
+                <ns4:mnt_tef>
+                    <xsl:value-of select="0"/>
+                </ns4:mnt_tef>
+            </ns4:inputSet>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Consulta Politicas De Ambiente">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>241</pd:x>
+        <pd:y>43</pd:y>
+        <config>
+            <processName>/Process/SubProcess/CL1SPORAC_CONPoliticasDeAmbiente.process</processName>
+        </config>
+        <pd:inputBindings>
+            <ns5:inputSet>
+                <ns5:IN_COD_CNL_LGC>
+                    <xsl:value-of select="$Start/Entrada/CANAL_LGC"/>
+                </ns5:IN_COD_CNL_LGC>
+                <ns5:IN_COD_FNC>
+                    <xsl:value-of select="$Start/Entrada/COD_FUNCIONALIDAD"/>
+                </ns5:IN_COD_FNC>
+                <ns5:IN_COD_TPO_FNC>
+                    <xsl:value-of select="$Start/Entrada/TIPO_FUNCIONALIDAD"/>
+                </ns5:IN_COD_TPO_FNC>
+                <ns5:IN_TPO_MND>
+                    <xsl:value-of select="$Start/Entrada/CODIGO_MONEDA"/>
+                </ns5:IN_TPO_MND>
+                <ns5:IN_COD_SGM>
+                    <xsl:value-of select="''"/>
+                </ns5:IN_COD_SGM>
+            </ns5:inputSet>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Consulta Usuario Excepcionado BN">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>241</pd:x>
+        <pd:y>296</pd:y>
+        <config>
+            <processName>/Process/SubProcess/CL1SPORAC_CONUsuarioExcepcionadoBN.process</processName>
+        </config>
+        <pd:inputBindings>
+            <pfx2:inputSet>
+                <pfx2:IN_COD_FNC>
+                    <xsl:value-of select="$Start/Entrada/COD_FUNCIONALIDAD"/>
+                </pfx2:IN_COD_FNC>
+                <pfx2:IN_COD_CNL_LGC>
+                    <xsl:value-of select="$Start/Entrada/CANAL_LGC"/>
+                </pfx2:IN_COD_CNL_LGC>
+                <pfx2:IN_COD_TPO_FNC>
+                    <xsl:value-of select="$Start/Entrada/TIPO_FUNCIONALIDAD"/>
+                </pfx2:IN_COD_TPO_FNC>
+                <pfx2:IN_ECC_RUT_USR>
+                    <xsl:value-of select="$Start/Entrada/ControlBeneficiarioNuevo/RUT_CARGO"/>
+                </pfx2:IN_ECC_RUT_USR>
+            </pfx2:inputSet>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Control fechas">
+        <pd:type>com.tibco.plugin.timer.NullActivity</pd:type>
+        <pd:resourceType>ae.activities.null</pd:resourceType>
+        <pd:x>782</pd:x>
+        <pd:y>290</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:activity name="ControlDeErrores">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>1046</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <processName>/Process/SubProcess/ControlDeErrores.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <elemento>
+                    <xsl:value-of xmlns:xsl="http://www.w3.org/1999/XSL/Transform" select="''"/>
+                </elemento>
+                <xsl:copy-of select="$_error/ns3:ErrorReport"/>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Informacion Beneficiario Nuevo">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>537</pd:x>
+        <pd:y>297</pd:y>
+        <config>
+            <element>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="nuevo" type="xsd:byte"/>
+                            <xsd:element name="MsjNuevo" type="xsd:string"/>
+                            <xsd:element name="MsjFecha1raTEF" type="xsd:string"/>
+                            <xsd:element name="MsjFecha2daTEF" type="xsd:string"/>
+                            <xsd:element name="MsjInformativo" type="xsd:string"/>
+                            <xsd:element name="PoliticaHoras" minOccurs="0">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="PoliticaEnHoras" type="xsd:int"/>
+                                        <xsd:element name="Fecha1raTEF" type="xsd:string"/>
+                                        <xsd:element name="FechaTEFActual" type="xsd:string"/>
+                                        <xsd:element name="FechaSiguienteTEF" type="xsd:dateTime"/>
+                                        <xsd:element name="dd_de_mmm_a_las_hh_mm" type="xsd:string"/>
+                                        <xsd:element name="FechaTEFActual_MenorA_FechaSigTEF" type="xsd:boolean"/>
+                                        <xsd:element name="FechaTEFActual_IgualA_FechaSigTEF" type="xsd:boolean"/>
+                                        <xsd:element name="FechaTEFActual_MayorA_FechaSigTEF" type="xsd:boolean"/>
+                                        <xsd:element name="MsjFechaSigTEF" type="xsd:string"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                            <xsd:element name="control">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="varFecha1raTEF" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="varFechaTEFActual" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="varPoliticaEnHoras" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="varFechaSigTEF" type="xsd:string" minOccurs="0"/>
+                                        <xsd:element name="varCompareFecha" type="xsd:string" minOccurs="0"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <xsl:variable name="varNuevo" select="number($Consulta-Estado-Beneficiario/ns4:outputSet/ns4:Resultsets/ns4:ResultSet1/ns4:Record1/ns4:ind_tef)"/>
+            <root>
+                <nuevo>
+                    <xsl:value-of select="$varNuevo"/>
+                </nuevo>
+                <MsjNuevo>
+                    <xsl:value-of select="concat(' - IndicadorBN=',$varNuevo,' - ',&#xA;if ($varNuevo=1) then 'Beneficiario nuevo'&#xA;else if ($varNuevo=2) then 'Beneficiario conocido (Rut+cuenta)'&#xA;else if ($varNuevo=3) then 'Beneficiario conocido con más de 2 TEF'&#xA;else if ($varNuevo=4) then 'Beneficiario conocido (Rut) - cuenta nueva'&#xA;else 'No controlado')"/>
+                </MsjNuevo>
+                <xsl:variable name="varFecha1raTEF_str" select="$Consulta-Estado-Beneficiario/ns4:outputSet/ns4:Resultsets/ns4:ResultSet1/ns4:Record1/ns4:fch_hra_lnz_trn"/>
+                <xsl:variable name="varFecha1raTEF" select="if (($varFecha1raTEF_str)!='') then tib:create-dateTime(tib:get-year-from-dateTime($varFecha1raTEF_str), &#xA;tib:get-month-from-dateTime($varFecha1raTEF_str), &#xA;tib:get-day-from-dateTime($varFecha1raTEF_str), &#xA;tib:get-hours-from-dateTime($varFecha1raTEF_str), &#xA;tib:get-minutes-from-dateTime($varFecha1raTEF_str), &#xA;tib:get-seconds-from-dateTime($varFecha1raTEF_str)) else ''"/>
+                <MsjFecha1raTEF>
+                    <xsl:value-of select="concat(' - Fecha 1ra TEF: ', translate($varFecha1raTEF, 'T', ' '))"/>
+                </MsjFecha1raTEF>
+                <xsl:variable name="varFechaTEFActual_str" select="$Start/Entrada/ControlBeneficiarioNuevo/FECHA_TEF"/>
+                <xsl:variable name="varFechaTEFActual" select="tib:create-dateTime(tib:get-year-from-dateTime($varFechaTEFActual_str), &#xA;tib:get-month-from-dateTime($varFechaTEFActual_str), &#xA;tib:get-day-from-dateTime($varFechaTEFActual_str), &#xA;tib:get-hours-from-dateTime($varFechaTEFActual_str), &#xA;tib:get-minutes-from-dateTime($varFechaTEFActual_str), &#xA;tib:get-seconds-from-dateTime($varFechaTEFActual_str))"/>
+                <MsjFecha2daTEF>
+                    <xsl:value-of select="concat(' - Fecha 2da TEF: ',translate($varFechaTEFActual, 'T', ' '))"/>
+                </MsjFecha2daTEF>
+                <MsjInformativo>
+                    <xsl:value-of select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns1:Informacion/ns1:Mensaje"/>
+                </MsjInformativo>
+                <xsl:choose>
+                    <xsl:when test="$varNuevo=2 or $varNuevo=4">
+                        <xsl:variable name="varPoliticaEnHoras" select="floor(number($Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:ResultSet1/ns5:Record1[ns5:COD_PCA=222]/ns5:VAL_PMT))"/>
+                        <xsl:variable name="varFechaSigTEF" select="tib:add-to-dateTime($varFecha1raTEF, 0, 0, 0, $varPoliticaEnHoras, 0, 0)"/>
+                        <xsl:variable name="varCompareFecha" select="tib:compare-dateTime($varFechaTEFActual, $varFechaSigTEF)"/>
+                        <PoliticaHoras>
+                            <PoliticaEnHoras>
+                                <xsl:value-of select="$varPoliticaEnHoras"/>
+                            </PoliticaEnHoras>
+                            <Fecha1raTEF>
+                                <xsl:value-of select="$varFecha1raTEF"/>
+                            </Fecha1raTEF>
+                            <FechaTEFActual>
+                                <xsl:value-of select="$varFechaTEFActual"/>
+                            </FechaTEFActual>
+                            <FechaSiguienteTEF>
+                                <xsl:value-of select="$varFechaSigTEF"/>
+                            </FechaSiguienteTEF>
+                            <!--primera < segunda = -1 - primera > segunda = 1 - primera = segunda = 0-->
+                            <dd_de_mmm_a_las_hh_mm>
+                                <xsl:value-of select="concat(tib:format-dateTime('dd', $varFechaSigTEF),' de ',&#xA;if (tib:get-month-from-dateTime($varFechaSigTEF)=1) then 'enero'&#xA;else if (tib:get-month-from-dateTime($varFechaSigTEF)=2) then 'febrero'&#xA;else if (tib:get-month-from-dateTime($varFechaSigTEF)=3) then 'marzo'&#xA;else if (tib:get-month-from-dateTime($varFechaSigTEF)=4) then 'abril'&#xA;else if (tib:get-month-from-dateTime($varFechaSigTEF)=5) then 'mayo'&#xA;else if (tib:get-month-from-dateTime($varFechaSigTEF)=6) then 'junio'&#xA;else if (tib:get-month-from-dateTime($varFechaSigTEF)=7) then 'julio'&#xA;else if (tib:get-month-from-dateTime($varFechaSigTEF)=8) then 'agosto'&#xA;else if (tib:get-month-from-dateTime($varFechaSigTEF)=9) then 'septiembre'&#xA;else if (tib:get-month-from-dateTime($varFechaSigTEF)=10) then 'octubre'&#xA;else if (tib:get-month-from-dateTime($varFechaSigTEF)=11) then 'noviembre'&#xA;else if (tib:get-month-from-dateTime($varFechaSigTEF)=12) then 'diciembre' else ''&#xA;,' a las ',tib:format-dateTime('HH:mm', $varFechaSigTEF))"/>
+                            </dd_de_mmm_a_las_hh_mm>
+                            <FechaTEFActual_MenorA_FechaSigTEF>
+                                <xsl:value-of select="$varCompareFecha = -1"/>
+                            </FechaTEFActual_MenorA_FechaSigTEF>
+                            <FechaTEFActual_IgualA_FechaSigTEF>
+                                <xsl:value-of select="$varCompareFecha = 0"/>
+                            </FechaTEFActual_IgualA_FechaSigTEF>
+                            <FechaTEFActual_MayorA_FechaSigTEF>
+                                <xsl:value-of select="$varCompareFecha = 1"/>
+                            </FechaTEFActual_MayorA_FechaSigTEF>
+                            <MsjFechaSigTEF>
+                                <xsl:value-of select="concat(' - Fecha Sig TEF: ',translate($varFechaSigTEF, 'T', ' '))"/>
+                            </MsjFechaSigTEF>
+                        </PoliticaHoras>
+                        <control>
+                            <varFecha1raTEF>
+                                <xsl:value-of select="$varFecha1raTEF"/>
+                            </varFecha1raTEF>
+                            <varFechaTEFActual>
+                                <xsl:value-of select="$varFechaTEFActual"/>
+                            </varFechaTEFActual>
+                            <varPoliticaEnHoras>
+                                <xsl:value-of select="$varPoliticaEnHoras"/>
+                            </varPoliticaEnHoras>
+                            <varFechaSigTEF>
+                                <xsl:value-of select="$varFechaSigTEF"/>
+                            </varFechaSigTEF>
+                            <varCompareFecha>
+                                <xsl:value-of select="$varCompareFecha"/>
+                            </varCompareFecha>
+                        </control>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <control>
+                            <varFecha1raTEF>
+                                <xsl:value-of select="$varFecha1raTEF"/>
+                            </varFecha1raTEF>
+                            <varFechaTEFActual>
+                                <xsl:value-of select="$varFechaTEFActual"/>
+                            </varFechaTEFActual>
+                        </control>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map OUTPUT">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>538</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <element>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element ref="ns1:Informacion"/>
+                            <xsd:element name="Recomendacion" type="xsd:string"/>
+                            <xsd:element name="Politicas" minOccurs="0" maxOccurs="unbounded">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="codigo" type="xsd:string"/>
+                                        <xsd:element name="valor" type="xsd:string"/>
+                                        <xsd:element name="descripcion" type="xsd:string"/>
+                                        <xsd:element name="valorFormateado" type="xsd:string"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                            <xsd:element name="IndicadorBeneficiario" type="xsd:string"/>
+                            <xsd:element name="MontoPoliticaPreLife" type="xsd:string"/>
+                            <xsd:element name="FlagPoliticaActiva" type="xsd:string"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:choose>
+                    <xsl:when test="$Consulta-Usuario-Excepcionado-BN/pfx2:outputSet/pfx2:WS_WARNING!='DECLINE'">
+                        <xsl:copy-of select="$Consulta-Usuario-Excepcionado-BN/pfx2:outputSet/ns1:Informacion"/>
+                        <Recomendacion>
+                            <xsl:value-of select="if ($Consulta-Usuario-Excepcionado-BN/pfx2:outputSet/pfx2:WS_WARNING='ALLOW') then 'Allow' &#xA;else if ($Consulta-Usuario-Excepcionado-BN/pfx2:outputSet/ns1:Informacion/ns1:Codigo=$_globalVariables/ns2:GlobalVariables/INFO/CodigoError) then 'ERROR' &#xA;else 'Decline'"/>
+                        </Recomendacion>
+                    </xsl:when>
+                    <xsl:when test="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:OUT_FLG_EST_FNC='SI'">
+                        <xsl:variable name="varNuevo" select="number($Consulta-Estado-Beneficiario/ns4:outputSet/ns4:Resultsets/ns4:ResultSet1/ns4:Record1/ns4:ind_tef)"/>
+                        <xsl:choose>
+                            <xsl:when test="exists($Validacion-Monto)">
+                                <xsl:copy-of select="$Validacion-Monto/root/ns1:Informacion"/>
+                                <Recomendacion>
+                                    <xsl:value-of select="$Validacion-Monto/root/Recomendacion"/>
+                                </Recomendacion>
+                                <xsl:copy-of select="$Validacion-Monto/root/Politicas"/>
+                            </xsl:when>
+                            <xsl:when test="exists($Validacion-Fecha)">
+                                <xsl:copy-of select="$Validacion-Fecha/root/ns1:Informacion"/>
+                                <Recomendacion>
+                                    <xsl:value-of select="$Validacion-Fecha/root/Recomendacion"/>
+                                </Recomendacion>
+                                <xsl:copy-of select="$Validacion-Fecha/root/Politicas"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <ns1:Informacion>
+                                    <ns1:Codigo>
+                                        <xsl:value-of select="$Consulta-Estado-Beneficiario/ns4:outputSet/ns1:Informacion/ns1:Codigo"/>
+                                    </ns1:Codigo>
+                                    <ns1:Resultado>
+                                        <xsl:value-of select="concat($Consulta-Estado-Beneficiario/ns4:outputSet/ns1:Informacion/ns1:Resultado,$Informacion-Beneficiario-Nuevo/root/MsjNuevo)"/>
+                                    </ns1:Resultado>
+                                    <ns1:Mensaje>
+                                        <xsl:value-of select="$Consulta-Estado-Beneficiario/ns4:outputSet/ns1:Informacion/ns1:Mensaje"/>
+                                    </ns1:Mensaje>
+                                </ns1:Informacion>
+                                <Recomendacion>
+                                    <xsl:value-of select="if ($Consulta-Estado-Beneficiario/ns4:outputSet/ns1:Informacion/ns1:Codigo=$_globalVariables/ns2:GlobalVariables/INFO/CodigoError) then 'ERROR' else 'Allow'"/>
+                                </Recomendacion>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <ns1:Informacion>
+                            <ns1:Codigo>
+                                <xsl:value-of select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns1:Informacion/ns1:Codigo"/>
+                            </ns1:Codigo>
+                            <ns1:Resultado>
+                                <xsl:value-of select="concat($Consulta-Politicas-De-Ambiente/ns5:outputSet/ns1:Informacion/ns1:Resultado, '; Flag Politicas en APS = ',$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:OUT_FLG_EST_FNC)"/>
+                            </ns1:Resultado>
+                            <ns1:Mensaje>
+                                <xsl:value-of select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns1:Informacion/ns1:Mensaje"/>
+                            </ns1:Mensaje>
+                        </ns1:Informacion>
+                        <Recomendacion>
+                            <xsl:value-of select="if ($Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:OUT_FLG_EST_FNC='NO') then 'Allow' else 'ERROR'"/>
+                        </Recomendacion>
+                        <xsl:for-each select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:ResultSet1/ns5:Record1">
+                            <Politicas>
+                                <codigo>
+                                    <xsl:value-of select="ns5:COD_PCA"/>
+                                </codigo>
+                                <valor>
+                                    <xsl:value-of select="ns5:VAL_PMT"/>
+                                </valor>
+                                <descripcion>
+                                    <xsl:value-of select="ns5:DESCRIPCION"/>
+                                </descripcion>
+                                <valorFormateado>
+                                    <xsl:value-of select="ns5:VALOR_FORMATEADO"/>
+                                </valorFormateado>
+                            </Politicas>
+                        </xsl:for-each>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <IndicadorBeneficiario>
+                    <xsl:value-of select="$Informacion-Beneficiario-Nuevo/root/MsjNuevo"/>
+                </IndicadorBeneficiario>
+                <MontoPoliticaPreLife>
+                    <xsl:value-of select="if (count($Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:ResultSet1/ns5:Record1[ns5:COD_PCA=333])=0) then 0&#xA;else number($Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:ResultSet1/ns5:Record1[ns5:COD_PCA=333]/ns5:VAL_PMT)"/>
+                </MontoPoliticaPreLife>
+                <FlagPoliticaActiva>
+                    <xsl:value-of select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:OUT_FLG_EST_PCA"/>
+                </FlagPoliticaActiva>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validacion Fecha">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>782</pd:x>
+        <pd:y>128</pd:y>
+        <config>
+            <element>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element ref="ns1:Informacion"/>
+                            <xsd:element name="Recomendacion" type="xsd:string"/>
+                            <xsd:element name="Politicas" minOccurs="0" maxOccurs="unbounded">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="codigo" type="xsd:string"/>
+                                        <xsd:element name="valor" type="xsd:string"/>
+                                        <xsd:element name="descripcion" type="xsd:string"/>
+                                        <xsd:element name="valorFormateado" type="xsd:string"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <xsl:variable name="varPoliticaHoras" select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:ResultSet1/ns5:Record1[ns5:COD_PCA=222]"/>
+            <root>
+                <ns1:Informacion>
+                    <ns1:Codigo>
+                        <xsl:value-of select="$Consulta-Estado-Beneficiario/ns4:outputSet/ns1:Informacion/ns1:Codigo"/>
+                    </ns1:Codigo>
+                    <xsl:choose>
+                        <xsl:when test="$Informacion-Beneficiario-Nuevo/root/PoliticaHoras/PoliticaEnHoras = 0">
+                            <ns1:Resultado>
+                                <xsl:value-of select="concat($Consulta-Estado-Beneficiario/ns4:outputSet/ns1:Informacion/ns1:Resultado,$Informacion-Beneficiario-Nuevo/root/MsjNuevo,&#xA;$Informacion-Beneficiario-Nuevo/root/MsjFecha1raTEF,' - Politica en 0')"/>
+                            </ns1:Resultado>
+                            <ns1:Mensaje>
+                                <xsl:value-of select="'Politica de horas en 0'"/>
+                            </ns1:Mensaje>
+                        </xsl:when>
+                        <xsl:when test="$Informacion-Beneficiario-Nuevo/root/PoliticaHoras/FechaTEFActual_MenorA_FechaSigTEF='true'">
+                            <ns1:Resultado>
+                                <xsl:value-of select="concat($Consulta-Estado-Beneficiario/ns4:outputSet/ns1:Informacion/ns1:Resultado,$Informacion-Beneficiario-Nuevo/root/MsjNuevo,&#xA;$Informacion-Beneficiario-Nuevo/root/MsjFecha1raTEF,$Informacion-Beneficiario-Nuevo/root/PoliticaHoras/MsjFechaSigTEF)"/>
+                            </ns1:Resultado>
+                            <xsl:variable name="varMensaje" select="$_globalVariables/ns2:GlobalVariables/MENSAJERIA/NoCumplePoliticaHoras"/>
+                            <ns1:Mensaje>
+                                <xsl:value-of select="if (tib:index-of($varMensaje, 'PARAM_Fecha_dd_de_mmm_a_las_hh_mm')=-1)&#xA;then $varMensaje&#xA;else concat(substring-before($varMensaje, 'PARAM_Fecha_dd_de_mmm_a_las_hh_mm'),&#xA;&#x9;$Informacion-Beneficiario-Nuevo/root/PoliticaHoras/dd_de_mmm_a_las_hh_mm,&#xA;&#x9;substring-after($varMensaje, 'PARAM_Fecha_dd_de_mmm_a_las_hh_mm'))"/>
+                            </ns1:Mensaje>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <ns1:Resultado>
+                                <xsl:value-of select="concat($Consulta-Estado-Beneficiario/ns4:outputSet/ns1:Informacion/ns1:Resultado,$Informacion-Beneficiario-Nuevo/root/MsjNuevo,&#xA;$Informacion-Beneficiario-Nuevo/root/MsjFecha1raTEF,$Informacion-Beneficiario-Nuevo/root/PoliticaHoras/MsjFechaSigTEF)"/>
+                            </ns1:Resultado>
+                            <ns1:Mensaje>
+                                <xsl:value-of select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns1:Informacion/ns1:Mensaje"/>
+                            </ns1:Mensaje>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </ns1:Informacion>
+                <Recomendacion>
+                    <xsl:value-of select="if ($Informacion-Beneficiario-Nuevo/root/PoliticaHoras/FechaTEFActual_MenorA_FechaSigTEF='true') then 'Decline' else 'Allow'"/>
+                </Recomendacion>
+                <xsl:for-each select="$varPoliticaHoras">
+                    <Politicas>
+                        <codigo>
+                            <xsl:value-of select="ns5:COD_PCA"/>
+                        </codigo>
+                        <valor>
+                            <xsl:value-of select="ns5:VAL_PMT"/>
+                        </valor>
+                        <descripcion>
+                            <xsl:value-of select="ns5:DESCRIPCION"/>
+                        </descripcion>
+                        <valorFormateado>
+                            <xsl:value-of select="ns5:VALOR_FORMATEADO"/>
+                        </valorFormateado>
+                    </Politicas>
+                </xsl:for-each>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Validacion Monto">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>665</pd:x>
+        <pd:y>160</pd:y>
+        <config>
+            <element>
+                <xsd:element name="root">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element ref="ns1:Informacion"/>
+                            <xsd:element name="Recomendacion" type="xsd:string"/>
+                            <xsd:element name="Politicas" minOccurs="0" maxOccurs="unbounded">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="codigo" type="xsd:string"/>
+                                        <xsd:element name="valor" type="xsd:string"/>
+                                        <xsd:element name="descripcion" type="xsd:string"/>
+                                        <xsd:element name="valorFormateado" type="xsd:string"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                            <xsd:element name="control">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="varMontoPolitica" type="xsd:string"/>
+                                        <xsd:element name="varMontoEntrada" type="xsd:string"/>
+                                        <xsd:element name="varDifMonto" type="xsd:string"/>
+                                        <xsd:element name="VALOR_FORMATEADO" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </element>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <xsl:variable name="varPoliticaMonto" select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:ResultSet1/ns5:Record1[ns5:COD_PCA=111 or ns5:COD_PCA=112 or ns5:COD_PCA=113]"/>
+                <xsl:variable name="varMontoEntrada" select="number($Start/Entrada/ControlBeneficiarioNuevo/MONTO_TEF) div (if ($varPoliticaMonto/ns5:COD_PCA=111) then 1 else 100)"/>
+                <xsl:variable name="varMontoPolitica" select="number($varPoliticaMonto/ns5:VAL_PMT)"/>
+                <xsl:variable name="varDifMonto" select="number($varMontoEntrada)-number($varMontoPolitica)"/>
+                <ns1:Informacion>
+                    <ns1:Codigo>
+                        <xsl:value-of select="$Consulta-Estado-Beneficiario/ns4:outputSet/ns1:Informacion/ns1:Codigo"/>
+                    </ns1:Codigo>
+                    <ns1:Resultado>
+                        <xsl:value-of select="concat($Consulta-Estado-Beneficiario/ns4:outputSet/ns1:Informacion/ns1:Resultado,$Informacion-Beneficiario-Nuevo/root/MsjNuevo)"/>
+                    </ns1:Resultado>
+                    <xsl:variable name="varDifMontoFormateado" select="concat(&#xA;(if ($varDifMonto>999999999999) then concat(floor($varDifMonto div 1000000000000), '.') else ''),&#xA;(if ($varDifMonto>   999999999) then tib:right(concat((if ($varDifMonto>999999999999) then '00' else ''),concat(floor(($varDifMonto mod 1000000000000) div 1000000000), '.')),4) else ''),&#xA;(if ($varDifMonto>      999999) then tib:right(concat((if ($varDifMonto>   999999999) then '00' else ''),concat(floor(($varDifMonto mod 1000000000) div 1000000), '.')),4) else ''),&#xA;(if ($varDifMonto>         999) then tib:right(concat((if ($varDifMonto>      999999) then '00' else ''),concat(floor(($varDifMonto mod 1000000) div 1000), '.')),4) else ''),&#xA;(if ($varDifMonto>           0) then tib:right(concat((if ($varDifMonto>         999) then '00' else ''),($varDifMonto mod 1000)),3) else '')&#xA;)"/>
+                    <xsl:variable name="varPoliticaHoras" select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:ResultSet1/ns5:Record1[ns5:COD_PCA=222]"/>
+                    <xsl:variable name="varMontoPoliticaPreLife" select="$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:ResultSet1/ns5:Record1[ns5:COD_PCA=333]"/>
+                    <xsl:variable name="varHorasPolitica" select="number($varPoliticaHoras/ns5:VAL_PMT)"/>
+                    <!--MENSAJES-->
+                    <xsl:variable name="Mensaje" select="if ($Start/Entrada/ClientePreLife='true') then&#xA;&#x9;if ($varDifMonto>0) then $_globalVariables/ns2:GlobalVariables/MENSAJERIA/PRELIFE/ExcedeMonto &#xA;&#x9;else $_globalVariables/ns2:GlobalVariables/MENSAJERIA/PRELIFE/Informativo&#xA;else&#xA;&#x9;if ($varDifMonto>0) then $_globalVariables/ns2:GlobalVariables/MENSAJERIA/ExcedeMonto &#xA;&#x9;else $_globalVariables/ns2:GlobalVariables/MENSAJERIA/Informativo"/>
+                    <xsl:variable name="PARAM_MontoExcedido" select="if (tib:index-of($Mensaje, 'PARAM_MontoExcedido')=-1) then $Mensaje&#xA;else concat(substring-before($Mensaje, 'PARAM_MontoExcedido'),$varDifMontoFormateado,substring-after($Mensaje, 'PARAM_MontoExcedido'))"/>
+                    <xsl:variable name="PARAM_HorasPolitica" select="if (tib:index-of($PARAM_MontoExcedido, 'PARAM_HorasPolitica')=-1) then $PARAM_MontoExcedido&#xA;else concat(substring-before($PARAM_MontoExcedido, 'PARAM_HorasPolitica'),$varHorasPolitica,substring-after($PARAM_MontoExcedido, 'PARAM_HorasPolitica'))"/>
+                    <xsl:variable name="PARAM_MontoPolitica" select="if (tib:index-of($PARAM_HorasPolitica, 'PARAM_MontoPolitica')=-1) then $PARAM_HorasPolitica&#xA;else concat(substring-before($PARAM_HorasPolitica, 'PARAM_MontoPolitica'),$varPoliticaMonto/ns5:VALOR_FORMATEADO,substring-after($PARAM_HorasPolitica, 'PARAM_MontoPolitica'))"/>
+                    <xsl:variable name="PARAM_MontoPoliticaPreLife" select="if (tib:index-of($PARAM_MontoPolitica, 'PARAM_MontoPoliticaPreLife')=-1) then $PARAM_MontoPolitica &#xA;else concat(substring-before($PARAM_MontoPolitica, 'PARAM_MontoPoliticaPreLife'),&#xA;$varMontoPoliticaPreLife/ns5:VALOR_FORMATEADO,substring-after($PARAM_MontoPolitica, 'PARAM_MontoPoliticaPreLife'))"/>
+                    <ns1:Mensaje>
+                        <xsl:value-of select="$PARAM_MontoPoliticaPreLife"/>
+                    </ns1:Mensaje>
+                </ns1:Informacion>
+                <Recomendacion>
+                    <xsl:value-of select="if ($varDifMonto>0) then 'Decline' else 'Allow'"/>
+                </Recomendacion>
+                <xsl:for-each select="$varPoliticaMonto">
+                    <Politicas>
+                        <codigo>
+                            <xsl:value-of select="ns5:COD_PCA"/>
+                        </codigo>
+                        <valor>
+                            <xsl:value-of select="ns5:VAL_PMT"/>
+                        </valor>
+                        <descripcion>
+                            <xsl:value-of select="ns5:DESCRIPCION"/>
+                        </descripcion>
+                        <valorFormateado>
+                            <xsl:value-of select="ns5:VALOR_FORMATEADO"/>
+                        </valorFormateado>
+                    </Politicas>
+                </xsl:for-each>
+                <control>
+                    <varMontoPolitica>
+                        <xsl:value-of select="$varMontoPolitica"/>
+                    </varMontoPolitica>
+                    <varMontoEntrada>
+                        <xsl:value-of select="$varMontoEntrada"/>
+                    </varMontoEntrada>
+                    <varDifMonto>
+                        <xsl:value-of select="$varDifMonto"/>
+                    </varDifMonto>
+                    <xsl:for-each select="$varPoliticaMonto/ns5:VALOR_FORMATEADO">
+                        <VALOR_FORMATEADO>
+                            <xsl:value-of select="."/>
+                        </VALOR_FORMATEADO>
+                    </xsl:for-each>
+                </control>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Log salida">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>754</pd:x>
+        <pd:y>35</pd:y>
+        <config>
+            <processName>/Process/SubProcess/EscribeEnElLog.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <Proceso>
+                    <xsl:value-of select="BW:getCurrentProcessName($_processContext/ns3:ProcessContext/ProcessId)"/>
+                </Proceso>
+                <Mensaje>
+                    <titulo>
+                        <xsl:value-of select="'Respuesta del proceso'"/>
+                    </titulo>
+                    <xml>
+                        <xsl:copy-of select="$Map-OUTPUT/root"/>
+                    </xml>
+                </Mensaje>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Consulta Politicas De Ambiente</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Consulta Politicas De Ambiente</pd:from>
+        <pd:to>Map OUTPUT</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map OUTPUT</pd:from>
+        <pd:to>Log salida</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Consulta Politicas De Ambiente</pd:from>
+        <pd:to>Consulta Usuario Excepcionado BN</pd:to>
+        <pd:xpathDescription>Pol activas</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:ResultSet1/ns5:Record1)&gt;0 and 
+$Consulta-Politicas-De-Ambiente/ns5:outputSet/ns5:OUT_FLG_EST_FNC='SI'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>ControlDeErrores</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>ControlDeErrores</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Consulta Usuario Excepcionado BN</pd:from>
+        <pd:to>Consulta Estado Beneficiario</pd:to>
+        <pd:xpathDescription>Decline</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Consulta-Usuario-Excepcionado-BN/pfx2:outputSet/pfx2:WS_WARNING='DECLINE'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Consulta Usuario Excepcionado BN</pd:from>
+        <pd:to>Map OUTPUT</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Informacion Beneficiario Nuevo</pd:from>
+        <pd:to>Validacion Monto</pd:to>
+        <pd:xpathDescription>nuevo=1</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Informacion-Beneficiario-Nuevo/root/nuevo=1</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Informacion Beneficiario Nuevo</pd:from>
+        <pd:to>Control fechas</pd:to>
+        <pd:xpathDescription>nuevo=2 o 4</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Informacion-Beneficiario-Nuevo/root/nuevo=2 or $Informacion-Beneficiario-Nuevo/root/nuevo=4</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Informacion Beneficiario Nuevo</pd:from>
+        <pd:to>Map OUTPUT</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Consulta Estado Beneficiario</pd:from>
+        <pd:to>Informacion Beneficiario Nuevo</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validacion Monto</pd:from>
+        <pd:to>Map OUTPUT</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Validacion Fecha</pd:from>
+        <pd:to>Map OUTPUT</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Control fechas</pd:from>
+        <pd:to>Validacion Monto</pd:to>
+        <pd:xpathDescription>nuevo=4 y fecha ok</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$Informacion-Beneficiario-Nuevo/root/nuevo=4 and $Informacion-Beneficiario-Nuevo/root/PoliticaHoras/FechaTEFActual_MenorA_FechaSigTEF='false'</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Control fechas</pd:from>
+        <pd:to>Validacion Fecha</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>otherwise</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Log salida</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:label>
+        <pd:name>Label</pd:name>
+        <pd:description>Consulta Estado Beneficiario - Codigos campo nuevo
+1) Rut destino nuevo - Politica de monto 111
+2) Rut y cuenta destino conocida - Politica de fecha 222
+3) Mas de 1 TEF a Rut y cuenta 
+4) Rut conocido y cuenta desconocida (nueva)
+     4.1 Politica de fecha 222 sobre 1ra TEF a Rut destino
+     4.2 Politica de monto</pd:description>
+        <pd:x>1031</pd:x>
+        <pd:y>153</pd:y>
+        <pd:width>329</pd:width>
+        <pd:height>126</pd:height>
+        <pd:fontColor>-16777216</pd:fontColor>
+        <pd:color>-52</pd:color>
+        <pd:type>solid</pd:type>
+        <pd:thickness>0</pd:thickness>
+        <pd:fade>false</pd:fade>
+    </pd:label>
+</pd:ProcessDefinition>
